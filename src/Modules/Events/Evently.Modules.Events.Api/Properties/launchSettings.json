@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Evently.Modules.Events.Api": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
