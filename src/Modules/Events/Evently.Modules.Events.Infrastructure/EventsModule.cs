@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using Evently.Modules.Events.Api.Database;
 using Evently.Modules.Events.Api.Events;
+using Evently.Modules.Events.Application.Abstractions.Data;
 using Evently.Modules.Events.Application.Events;
+using Evently.Modules.Events.Domain.Events;
+using Evently.Modules.Events.Infrastructure.Events;
 using Evently.Modules.Events.Presentation.Events;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +34,10 @@ public static class EventsModule
             )
             .UseSnakeCaseNamingConvention()
         );
+
+        services.AddScoped<IEventRepository, EventRepository>();
+
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<EventsDbContext>());
 
         return services;
     }
