@@ -1,8 +1,8 @@
 
 ## Migrations
 
-cd into src/API/Evently.Api
+cd into src\API\Evently.Api
 
 ```powershell
-dotnet ef migrations add CreateDatabase -c EventsDbContext -o Database/Migrations -p ..\..\Modules\Events\Evently.Modules.Events.Api\Evently.Modules.Events.Api.csproj
+dotnet ef migrations add MIGRATION_NAME -c DB_CONTEXT -o Database\Migrations -p ..\..\Modules\Events\Evently.Modules.Events.Infrastructure\Evently.Modules.Events.Infrastructure.csproj
 ```
