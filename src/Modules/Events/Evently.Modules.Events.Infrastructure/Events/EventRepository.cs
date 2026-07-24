@@ -1,4 +1,5 @@
 ﻿using Evently.Modules.Events.Api.Database;
+using Evently.Modules.Events.Application.Events;
 using Evently.Modules.Events.Domain.Events;
 
 namespace Evently.Modules.Events.Infrastructure.Events;
