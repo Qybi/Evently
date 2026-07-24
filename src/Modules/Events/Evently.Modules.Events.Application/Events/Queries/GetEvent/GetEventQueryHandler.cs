@@ -1,9 +1,7 @@
 ﻿using Evently.Modules.Events.Application.Events.DTO;
 using MediatR;
 
-namespace Evently.Modules.Events.Application.Events.Queries;
-
-public sealed record GetEventQuery(Guid EventId) : IRequest<EventResponseDto?>;
+namespace Evently.Modules.Events.Application.Events.Queries.GetEvent;
 
 internal sealed class GetEventQueryHandler(IEventQueries eventQueries) : IRequestHandler<GetEventQuery, EventResponseDto?>
 {
