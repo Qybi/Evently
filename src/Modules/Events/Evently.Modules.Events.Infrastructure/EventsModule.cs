@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Evently.Modules.Events.Api;
+namespace Evently.Modules.Events.Infrastructure;
 
 public static class EventsModule
 {
@@ -47,7 +47,5 @@ public static class EventsModule
         services.AddSingleton<IEventQueries, EventQueries>();
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<EventsDbContext>());
-
-        return services;
     }
 }
