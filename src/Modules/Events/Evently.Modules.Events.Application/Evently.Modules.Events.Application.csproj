@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="MediatR" />
-    <PackageReference Include="Riok.Mapperly" />
+    <PackageReference Include="Riok.Mapperly" PrivateAssets="all"/>
   </ItemGroup>
 
   <ItemGroup>
