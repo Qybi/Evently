@@ -21,6 +21,18 @@ public static class EventsModule
 
     public static IServiceCollection AddEventsModule(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssemblies(Application.AssemblyReference.Assembly);
+        });
+
+        services.AddInfrastructure(configuration);
+
+        return services;
+    }
+
+    private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
         string databaseConnectionString = configuration.GetConnectionString("Database")!;
 
         services.AddDbContext<EventsDbContext>(
