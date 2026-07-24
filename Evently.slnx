@@ -13,6 +13,10 @@
   <Folder Name="/src/Modules/" />
   <Folder Name="/src/Modules/Events/">
     <Project Path="src/Modules/Events/Evently.Modules.Events.Api/Evently.Modules.Events.Api.csproj" />
+    <Project Path="src/Modules/Events/Evently.Modules.Events.Application/Evently.Modules.Events.Application.csproj" Id="9a5a7c57-177f-4446-b955-e1826cdadc46" />
+    <Project Path="src/Modules/Events/Evently.Modules.Events.Domain/Evently.Modules.Events.Domain.csproj" Id="23fe6335-2143-4dae-9323-1c44b0a89416" />
+    <Project Path="src/Modules/Events/Evently.Modules.Events.Infrastructure/Evently.Modules.Events.Infrastructure.csproj" Id="2e05a8a4-f5e1-4888-9e52-43000c7a8019" />
+    <Project Path="src/Modules/Events/Evently.Modules.Events.Presentation/Evently.Modules.Events.Presentation.csproj" Id="e1022fc1-ad04-44c1-927e-8824464cd51a" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
