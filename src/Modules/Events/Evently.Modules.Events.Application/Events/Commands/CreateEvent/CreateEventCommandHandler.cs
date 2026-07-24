@@ -1,4 +1,5 @@
 ﻿using Evently.Modules.Events.Application.Abstractions.Data;
+using Evently.Modules.Events.Domain.Abstractions;
 using Evently.Modules.Events.Domain.Events;
 using MediatR;
 
@@ -8,16 +9,13 @@ internal sealed class CreateEventCommandHandler(IEventRepository eventRepository
 {
     public async Task<Guid> Handle(CreateEventCommand request, CancellationToken cancellationToken)
     {
-        var @event = new Event()
-        {
-            Id = Guid.CreateVersion7(),
-            Title = request.Title,
-            Description = request.Description,
-            Location = request.Location,
-            StartsAtUtc = request.StartsAtUtc,
-            EndsAtUtc = request.EndsAtUtc,
-            Status = EventStatus.Draft
-        };
+        var @event = Event.Create(
+                request.Title,
+                request.Description,
+                request.Location,
+                request.StartsAtUtc,
+                request.EndsAtUtc
+            );
 
         eventRepository.Insert(@event);
 
