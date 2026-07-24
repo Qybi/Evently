@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Evently.Modules.Events.Api.Database;
-using Evently.Modules.Events.Api.Events;
+﻿using Evently.Modules.Events.Api.Database;
 using Evently.Modules.Events.Application.Abstractions.Data;
-using Evently.Modules.Events.Application.Events;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.Infrastructure.Events;
 using Evently.Modules.Events.Presentation.Events;
@@ -29,7 +24,7 @@ public static class EventsModule
 
         services.AddDbContext<EventsDbContext>(
             options => options.UseNpgsql(
-                databaseConnectionString, 
+                databaseConnectionString,
                 npgsqlOptions => npgsqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Events)
             )
             .UseSnakeCaseNamingConvention()
