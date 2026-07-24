@@ -1,4 +1,5 @@
-﻿using Evently.Modules.Events.Application.Events;
+﻿using Evently.Modules.Events.Application.Events.DTO;
+using Evently.Modules.Events.Application.Events.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -8,12 +9,12 @@ namespace Evently.Modules.Events.Api.Events;
 
 internal static class GetEvent
 {
-    public static void MapEndpoint(IEndpointRouteBuilder app)
+    internal static void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("events/{id}", async (Guid id, ISender sender) =>
         {
             var query = new GetEventQuery(id);
-            EventResponse? @event = await sender.Send(query);
+            EventResponseDto? @event = await sender.Send(query);
 
             return @event is null ? Results.NotFound() : Results.Ok(@event);
         }).WithTags(Tags.Events);
