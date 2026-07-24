@@ -1,5 +1,6 @@
 ﻿using Evently.Modules.Events.Api.Database;
 using Evently.Modules.Events.Application.Abstractions.Data;
+using Evently.Modules.Events.Application.Events;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.Infrastructure.Events;
 using Evently.Modules.Events.Presentation.Events;
@@ -31,6 +32,7 @@ public static class EventsModule
         );
 
         services.AddScoped<IEventRepository, EventRepository>();
+        services.AddSingleton<IEventQueries, EventQueries>();
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<EventsDbContext>());
 
