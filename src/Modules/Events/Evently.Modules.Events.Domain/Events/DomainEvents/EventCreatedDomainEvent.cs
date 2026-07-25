@@ -1,6 +1,6 @@
-﻿using Evently.Modules.Events.Domain.Abstractions;
+﻿using Evently.Modules.Events.Domain.Abstractions.DomainEvents;
 
-namespace Evently.Modules.Events.Domain.Events;
+namespace Evently.Modules.Events.Domain.Events.DomainEvents;
 
 public sealed class EventCreatedDomainEvent(Guid eventId) : DomainEvent
 {
