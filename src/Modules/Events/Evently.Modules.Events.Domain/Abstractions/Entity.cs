@@ -1,4 +1,6 @@
-﻿namespace Evently.Modules.Events.Domain.Abstractions;
+﻿using Evently.Modules.Events.Domain.Abstractions.DomainEvents;
+
+namespace Evently.Modules.Events.Domain.Abstractions;
 
 public abstract class Entity
 {
