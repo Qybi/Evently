@@ -37,6 +37,8 @@ public static class EventsModule
     {
         string databaseConnectionString = configuration.GetConnectionString("Database")!;
 
+        services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
+
         services.AddDbContext<EventsDbContext>(
             options => options.UseNpgsql(
                 databaseConnectionString,
