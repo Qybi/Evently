@@ -1,5 +1,4 @@
-﻿using Evently.Modules.Events.Application.Events.Queries.GetEvent;
-using Evently.Modules.Events.Application.Events.Queries.ViewModels;
+﻿using Evently.Modules.Events.Application.Events.Commands.CancelEvent;
 using Evently.Modules.Events.Domain.Abstractions;
 using Evently.Modules.Events.Presentation.ApiResults;
 using MediatR;
@@ -9,15 +8,15 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Evently.Modules.Events.Presentation.Events;
 
-internal static class GetEvent
+internal static class CancelEvent
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("events/{id}", async (Guid id, ISender sender) =>
+        app.MapDelete("events/{id}/cancel", async (Guid id, ISender sender) =>
         {
-            Result<EventViewModel> result = await sender.Send(new GetEventQuery(id));
+            Result result = await sender.Send(new CancelEventCommand(id));
 
-            return result.Match(Results.Ok, ApiResults.ApiResults.Problem);
+            return result.Match(Results.NoContent, ApiResults.ApiResults.Problem);
         })
         .WithTags(Tags.Events);
     }
