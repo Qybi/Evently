@@ -162,6 +162,7 @@ public class Result<TValue> : Result
     /// The stored value should only be accessed through the
     /// <see cref="Value"/> property.
     /// </remarks>
+    [SuppressMessage("Style", "IDE0032:Use auto property", Justification = "Value has a failure guard.")]
     private readonly TValue? _value;
 
     /// <summary>
