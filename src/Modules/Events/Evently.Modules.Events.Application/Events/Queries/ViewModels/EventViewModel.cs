@@ -1,7 +1,8 @@
-﻿namespace Evently.Modules.Events.Application.Events.DTO;
+namespace Evently.Modules.Events.Application.Events.Queries.ViewModels;
 
-public sealed record EventResponseDto(
+public sealed record EventViewModel(
     Guid Id,
+    Guid CategoryId,
     string Title,
     string Description,
     string Location,
