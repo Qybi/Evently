@@ -1,3 +1,8 @@
+# Qybi's Evently
+
+This is a personal flavoured version of Milan's Jovanovic Modular Monolith application course.
+My current version runs on the following stack:
+
 
 ## Migrations
 
