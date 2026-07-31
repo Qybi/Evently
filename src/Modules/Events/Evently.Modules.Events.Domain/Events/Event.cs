@@ -1,4 +1,5 @@
 ﻿using Evently.Modules.Events.Domain.Abstractions;
+using Evently.Modules.Events.Domain.Categories;
 using Evently.Modules.Events.Domain.Events.DomainEvents;
 using Evently.Modules.Events.Domain.Events.Errors;
 
@@ -20,6 +21,7 @@ public sealed class Event : Entity
     public EventStatus Status { get; private set; }
 
     public static Result<Event> Create(
+        Category category,
         string title,
         string description,
         string location,
@@ -34,6 +36,7 @@ public sealed class Event : Entity
         var @event = new Event()
         {
             Id = Guid.CreateVersion7(),
+            CategoryId = category.Id,
             Title = title,
             Description = description,
             Location = location,
@@ -85,6 +88,8 @@ public sealed class Event : Entity
         {
             return Result.Failure(EventErrors.AlreadyStarted);
         }
+
+        Status = EventStatus.Canceled;
 
         Raise(new EventCanceledDomainEvent(Id));
 

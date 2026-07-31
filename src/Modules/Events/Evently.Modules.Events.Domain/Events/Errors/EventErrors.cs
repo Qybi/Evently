@@ -5,7 +5,7 @@ namespace Evently.Modules.Events.Domain.Events.Errors;
 public static class EventErrors
 {
     public static Error NotFound(Guid eventId) => Error.NotFound("Events.NotFound", $"The event with the identifier {eventId} was not found");
-    public static readonly Error StarDateInPast = Error.Problem("Events.StartDateInPast", "The event start date is in the past");
+    public static readonly Error StartDateInPast = Error.Problem("Events.StartDateInPast", "The event start date is in the past");
     public static readonly Error EndDatePrecedesStartDate = Error.Problem("Events.EndDatePrecedesStartDate", "The event end date precedes the start date");
     public static readonly Error NoTicketTypesFound = Error.Problem("Events.NoTicketsFound", "The event does not have any tickets types defined");
     public static readonly Error NotDraft = Error.Problem("Events.NotDraft", "The event is not in draft status");
