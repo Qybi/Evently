@@ -17,6 +17,11 @@
     <Project Path="src/Modules/Events/Evently.Modules.Events.Infrastructure/Evently.Modules.Events.Infrastructure.csproj" Id="2e05a8a4-f5e1-4888-9e52-43000c7a8019" />
     <Project Path="src/Modules/Events/Evently.Modules.Events.Presentation/Evently.Modules.Events.Presentation.csproj" Id="e1022fc1-ad04-44c1-927e-8824464cd51a" />
   </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Evently.Shared.Application/Evently.Shared.Application.csproj" Id="ff32efdd-aef6-4ecb-8b13-1afbb1b16cba" />
+    <Project Path="src/Shared/Evently.Shared.Domain/Evently.Shared.Domain.csproj" Id="6d81f49c-34ff-4439-a9b2-8030ab70464c" />
+    <Project Path="src/Shared/Evently.Shared.Infrastructure/Evently.Shared.Infrastructure.csproj" Id="cfcdd96c-3d50-49e5-929b-09e0d92284cb" />
+  </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
