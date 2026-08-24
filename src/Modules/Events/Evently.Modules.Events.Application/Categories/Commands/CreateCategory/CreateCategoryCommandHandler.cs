@@ -1,7 +1,7 @@
 ﻿using Evently.Modules.Events.Application.Abstractions.Data;
-using Evently.Modules.Events.Application.Abstractions.Messaging;
-using Evently.Modules.Events.Domain.Abstractions;
 using Evently.Modules.Events.Domain.Categories;
+using Evently.Shared.Application.Messaging;
+using Evently.Shared.Domain;
 
 namespace Evently.Modules.Events.Application.Categories.Commands.CreateCategory;
 

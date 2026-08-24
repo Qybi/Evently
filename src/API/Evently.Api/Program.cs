@@ -1,5 +1,7 @@
 using Evently.Api.Extensions;
 using Evently.Modules.Events.Infrastructure;
+using Evently.Shared.Application;
+using Evently.Shared.Infrastructure;
 using Microsoft.OpenApi;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,11 @@ builder.Services.AddOpenApi(options =>
         return Task.CompletedTask;
     });
 });
+
+builder.Services.AddApplication([Evently.Modules.Events.Application.AssemblyReference.Assembly]);
+
+builder.Services.AddInfrastructure();
+
 builder.Services.AddEventsModule(builder.Configuration);
 
 WebApplication app = builder.Build();

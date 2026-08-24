@@ -1,10 +1,10 @@
 ﻿using Evently.Modules.Events.Application.Abstractions.Data;
-using Evently.Modules.Events.Application.Abstractions.Messaging;
 using Evently.Modules.Events.Application.Events;
-using Evently.Modules.Events.Domain.Abstractions;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.Domain.Events.Errors;
 using Evently.Modules.Events.Domain.TicketTypes;
+using Evently.Shared.Application.Messaging;
+using Evently.Shared.Domain;
 
 namespace Evently.Modules.Events.Application.TicketTypes.Commands.CreateTicketType;
 

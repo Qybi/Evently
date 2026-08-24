@@ -1,12 +1,12 @@
-﻿using Evently.Modules.Events.Application.Abstractions.Clock;
-using Evently.Modules.Events.Application.Abstractions.Data;
-using Evently.Modules.Events.Application.Abstractions.Messaging;
+﻿using Evently.Modules.Events.Application.Abstractions.Data;
 using Evently.Modules.Events.Application.Categories;
-using Evently.Modules.Events.Domain.Abstractions;
 using Evently.Modules.Events.Domain.Categories;
 using Evently.Modules.Events.Domain.Categories.Errors;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.Domain.Events.Errors;
+using Evently.Shared.Application.Clock;
+using Evently.Shared.Application.Messaging;
+using Evently.Shared.Domain;
 
 namespace Evently.Modules.Events.Application.Events.Commands.CreateEvent;
 

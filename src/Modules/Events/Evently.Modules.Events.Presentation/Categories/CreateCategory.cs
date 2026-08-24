@@ -1,6 +1,6 @@
 ﻿using Evently.Modules.Events.Application.Categories.Commands.CreateCategory;
-using Evently.Modules.Events.Domain.Abstractions;
 using Evently.Modules.Events.Presentation.ApiResults;
+using Evently.Shared.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

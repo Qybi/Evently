@@ -1,17 +1,14 @@
 ﻿using Evently.Modules.Events.Api.Database;
-using Evently.Modules.Events.Application.Abstractions.Clock;
 using Evently.Modules.Events.Application.Abstractions.Data;
 using Evently.Modules.Events.Application.Categories;
 using Evently.Modules.Events.Application.Events;
 using Evently.Modules.Events.Application.TicketTypes;
-using Evently.Modules.Events.Infrastructure.Clock;
 using Evently.Modules.Events.Infrastructure.Database;
 using Evently.Modules.Events.Infrastructure.Queries;
 using Evently.Modules.Events.Infrastructure.Repositories;
 using Evently.Modules.Events.Presentation.Categories;
 using Evently.Modules.Events.Presentation.Events;
 using Evently.Modules.Events.Presentation.TicketTypes;
-using FluentValidation;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -32,13 +29,6 @@ public static class EventsModule
 
     public static IServiceCollection AddEventsModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssemblies(Application.AssemblyReference.Assembly);
-        });
-
-        services.AddValidatorsFromAssembly(Application.AssemblyReference.Assembly, includeInternalTypes: true);
-
         services.AddInfrastructure(configuration);
 
         return services;
@@ -47,8 +37,6 @@ public static class EventsModule
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         string databaseConnectionString = configuration.GetConnectionString("Database")!;
-
-        services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddDbContext<EventsDbContext>(
             options => options.UseNpgsql(

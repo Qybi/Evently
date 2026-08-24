@@ -1,7 +1,7 @@
-﻿using Evently.Modules.Events.Domain.Abstractions;
-using Evently.Modules.Events.Domain.Categories;
+﻿using Evently.Modules.Events.Domain.Categories;
 using Evently.Modules.Events.Domain.Events.DomainEvents;
 using Evently.Modules.Events.Domain.Events.Errors;
+using Evently.Shared.Domain;
 
 namespace Evently.Modules.Events.Domain.Events;
 

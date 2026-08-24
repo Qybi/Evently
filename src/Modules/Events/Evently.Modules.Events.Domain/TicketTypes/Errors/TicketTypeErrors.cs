@@ -1,4 +1,4 @@
-﻿using Evently.Modules.Events.Domain.Abstractions.Errors;
+﻿using Evently.Shared.Domain.Errors;
 
 namespace Evently.Modules.Events.Domain.TicketTypes.Errors;
 

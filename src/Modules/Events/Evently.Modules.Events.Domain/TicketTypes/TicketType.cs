@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Evently.Modules.Events.Domain.Abstractions;
-using Evently.Modules.Events.Domain.Events;
+﻿using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.Domain.TicketTypes.DomainEvents;
+using Evently.Shared.Domain;
 
 namespace Evently.Modules.Events.Domain.TicketTypes;
 
@@ -15,7 +12,7 @@ public sealed class TicketType : Entity
     public Guid EventId { get; private set; }
     public string Name { get; private set; }
     public decimal Price { get; private set; }
-    public string Currency {  get; private set; }
+    public string Currency { get; private set; }
     public decimal Quantity { get; private set; }
 
     public static TicketType Create(

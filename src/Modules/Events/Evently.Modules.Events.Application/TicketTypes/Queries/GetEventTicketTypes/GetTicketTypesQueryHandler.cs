@@ -1,6 +1,6 @@
-using Evently.Modules.Events.Application.Abstractions.Messaging;
 using Evently.Modules.Events.Application.TicketTypes.Queries.ViewModels;
-using Evently.Modules.Events.Domain.Abstractions;
+using Evently.Shared.Application.Messaging;
+using Evently.Shared.Domain;
 
 namespace Evently.Modules.Events.Application.TicketTypes.Queries.GetEventTicketTypes;
 
