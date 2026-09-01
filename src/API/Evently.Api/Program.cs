@@ -3,8 +3,11 @@ using Evently.Modules.Events.Infrastructure;
 using Evently.Shared.Application;
 using Evently.Shared.Infrastructure;
 using Microsoft.OpenApi;
+using Serilog;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddOpenApi(options =>
 {
