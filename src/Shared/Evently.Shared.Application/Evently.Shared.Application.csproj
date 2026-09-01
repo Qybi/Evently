@@ -3,6 +3,7 @@
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
 		<PackageReference Include="MediatR" />
 		<PackageReference Include="Riok.Mapperly" PrivateAssets="all" />
+		<PackageReference Include="Serilog" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Evently.Shared.Domain\Evently.Shared.Domain.csproj" />
