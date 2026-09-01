@@ -42,4 +42,6 @@ if (app.Environment.IsDevelopment())
 
 EventsModule.MapEndpoints(app);
 
+app.UseSerilogRequestLogging();
+
 app.Run();
