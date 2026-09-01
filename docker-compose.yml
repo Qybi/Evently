@@ -28,3 +28,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  evently.seq:
+    image: datalust/seq:latest
+    container_name: Evently.Seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5344:5341
+      - 8082:80

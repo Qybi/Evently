@@ -9,4 +9,8 @@ services:
       - "8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro 
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  
+  evently.seq:
+    environment:
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
