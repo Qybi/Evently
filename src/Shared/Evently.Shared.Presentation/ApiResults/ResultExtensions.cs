@@ -1,6 +1,6 @@
 ﻿using Evently.Shared.Domain;
 
-namespace Evently.Modules.Events.Presentation.ApiResults;
+namespace Evently.Shared.Presentation.ApiResults;
 
 public static class ResultExtensions
 {

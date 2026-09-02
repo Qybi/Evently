@@ -2,7 +2,7 @@
 using Evently.Shared.Domain.Errors;
 using Microsoft.AspNetCore.Http;
 
-namespace Evently.Modules.Events.Presentation.ApiResults;
+namespace Evently.Shared.Presentation.ApiResults;
 
 public static class ApiResults
 {
