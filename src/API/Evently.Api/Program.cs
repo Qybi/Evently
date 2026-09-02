@@ -30,7 +30,7 @@ builder.Services.AddOpenApi(options =>
 
 builder.Services.AddApplication([Evently.Modules.Events.Application.AssemblyReference.Assembly]);
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("Cache")!);
 
 builder.Configuration.AddModuleConfiguration(["events"]);
 
