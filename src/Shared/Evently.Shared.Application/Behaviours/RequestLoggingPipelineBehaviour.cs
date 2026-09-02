@@ -3,10 +3,10 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
 
-namespace Evently.Common.Application.Behaviors;
+namespace Evently.Shared.Application.Behaviours;
 
-internal sealed class RequestLoggingPipelineBehavior<TRequest, TResponse>(
-    ILogger<RequestLoggingPipelineBehavior<TRequest, TResponse>> logger)
+internal sealed class RequestLoggingPipelineBehaviour<TRequest, TResponse>(
+    ILogger<RequestLoggingPipelineBehaviour<TRequest, TResponse>> logger)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : class
     where TResponse : Result
