@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Evently.Common.Application.Behaviors;
+using Evently.Shared.Application.Behaviours;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ public static class ApplicationConfiguration
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssemblies(moduleAssemblies);
+
+            config.AddOpenBehavior(typeof(ExceptionHandlingPipelineBehaviour<,>));
             config.AddOpenBehavior(typeof(RequestLoggingPipelineBehavior<,>));
         });
 
