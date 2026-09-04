@@ -1,6 +1,8 @@
-﻿namespace Evently.Shared.Domain.DomainEvents;
+﻿using MediatR;
 
-public interface IDomainEvent
+namespace Evently.Shared.Domain.DomainEvents;
+
+public interface IDomainEvent : INotification
 {
     Guid Id { get; }
     DateTime OccurredOnUtc { get; }
