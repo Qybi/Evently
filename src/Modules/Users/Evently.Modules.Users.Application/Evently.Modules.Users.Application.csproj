@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<PackageReference Include="Riok.Mapperly" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Shared\Evently.Shared.Application\Evently.Shared.Application.csproj" />
+		<ProjectReference Include="..\Evently.Modules.Users.Domain\Evently.Modules.Users.Domain.csproj" />
+	</ItemGroup>
+</Project>
