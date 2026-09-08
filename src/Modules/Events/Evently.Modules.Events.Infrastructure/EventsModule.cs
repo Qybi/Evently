@@ -4,8 +4,10 @@ using Evently.Modules.Events.Application.Categories;
 using Evently.Modules.Events.Application.Events;
 using Evently.Modules.Events.Application.TicketTypes;
 using Evently.Modules.Events.Infrastructure.Database;
+using Evently.Modules.Events.Infrastructure.PublicApi;
 using Evently.Modules.Events.Infrastructure.Queries;
 using Evently.Modules.Events.Infrastructure.Repositories;
+using Evently.Modules.Events.PublicApi;
 using Evently.Shared.Infrastructure.Interceptors;
 using Evently.Shared.Presentation.Endpoints;
 using Microsoft.EntityFrameworkCore;
@@ -48,5 +50,7 @@ public static class EventsModule
         services.AddScoped<IEventQueries, EventQueries>();
         services.AddScoped<ICategoryQueries, CategoryQueries>();
         services.AddScoped<ITicketTypeQueries, TicketTypeQueries>();
+
+        services.AddScoped<IEventsApi, EventsApi>();
     }
 }
