@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Evently.Modules.Ticketing.Application.Carts;
+using Evently.Shared.Presentation.Endpoints;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evently.Modules.Ticketing.Infrastructure;
@@ -14,22 +16,12 @@ public static class TicketingModule
 
         return services;
     }
-
+#pragma warning disable S1172
+#pragma warning disable IDE0060
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+#pragma warning restore S1172
+#pragma warning restore IDE0060
     {
-        services.AddDbContext<UsersDbContext>(
-            (sp, options) => options
-                .UseNpgsql(
-                    configuration.GetConnectionString("Database"),
-                    npgsqlOptions => npgsqlOptions
-                        .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Users))
-                .UseSnakeCaseNamingConvention()
-                .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>()));
-
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UsersDbContext>());
-
-        services.AddScoped<IUserRepository, UserRepository>();
-
-        services.AddScoped<IUserQueries, UserQueries>();
+        services.AddSingleton<CartService>();
     }
 }

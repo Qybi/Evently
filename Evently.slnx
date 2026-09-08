@@ -16,6 +16,7 @@
     <Project Path="src/Modules/Events/Evently.Modules.Events.Domain/Evently.Modules.Events.Domain.csproj" Id="23fe6335-2143-4dae-9323-1c44b0a89416" />
     <Project Path="src/Modules/Events/Evently.Modules.Events.Infrastructure/Evently.Modules.Events.Infrastructure.csproj" Id="2e05a8a4-f5e1-4888-9e52-43000c7a8019" />
     <Project Path="src/Modules/Events/Evently.Modules.Events.Presentation/Evently.Modules.Events.Presentation.csproj" Id="e1022fc1-ad04-44c1-927e-8824464cd51a" />
+    <Project Path="src/Modules/Events/Evently.Modules.Events.PublicApi/Evently.Modules.Events.PublicApi.csproj" Id="8fb05b94-c749-4869-af66-0411b68bb416" />
   </Folder>
   <Folder Name="/src/Modules/Ticketing/">
     <Project Path="src/Modules/Ticketing/Evently.Modules.Ticketing.Application/Evently.Modules.Ticketing.Application.csproj" Id="7cb34ab5-0725-4e6a-96e9-f0e354caf226" />
@@ -23,11 +24,12 @@
     <Project Path="src/Modules/Ticketing/Evently.Modules.Ticketing.Infrastructure/Evently.Modules.Ticketing.Infrastructure.csproj" Id="39eb4981-b250-4ca4-9ee7-a0ab89fc728c" />
     <Project Path="src/Modules/Ticketing/Evently.Modules.Ticketing.Presentation/Evently.Modules.Ticketing.Presentation.csproj" Id="f0982307-5445-42dd-a9d0-c2648a933e7c" />
   </Folder>
-  <Folder Name="/src/Modules/Users/" Id="a26f344d-182e-ce53-ad51-2154946ac6f3">
+  <Folder Name="/src/Modules/Users/">
     <Project Path="src/Modules/Users/Evently.Modules.Users.Application/Evently.Modules.Users.Application.csproj" Id="8831e026-3ace-44c1-9f38-9cef94b9b231" />
     <Project Path="src/Modules/Users/Evently.Modules.Users.Domain/Evently.Modules.Users.Domain.csproj" Id="0a9d5eb3-22d7-410b-905f-49e74de552c6" />
     <Project Path="src/Modules/Users/Evently.Modules.Users.Infrastructure/Evently.Modules.Users.Infrastructure.csproj" Id="9e33fd60-8581-43e0-bada-8f1ce71d6aa2" />
     <Project Path="src/Modules/Users/Evently.Modules.Users.Presentation/Evently.Modules.Users.Presentation.csproj" Id="fddcbd6e-be64-4a30-9ad5-eb1855de9270" />
+    <Project Path="src/Modules/Users/Evently.Modules.Users.PublicApi/Evently.Modules.Users.PublicApi.csproj" Id="9271fec5-862f-4fb7-915d-cf718698be63" />
   </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="src/Shared/Evently.Shared.Application/Evently.Shared.Application.csproj" Id="ff32efdd-aef6-4ecb-8b13-1afbb1b16cba" />
