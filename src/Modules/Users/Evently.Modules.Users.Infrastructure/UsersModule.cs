@@ -42,7 +42,5 @@ public static class UsersModule
         services.AddScoped<IUserRepository, UserRepository>();
 
         services.AddScoped<IUserQueries, UserQueries>();
-
-        services.AddScoped<IUsersApi, UsersApi>();
     }
 }
