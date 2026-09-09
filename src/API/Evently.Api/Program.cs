@@ -42,7 +42,9 @@ builder.Services.AddApplication([
 string databaseConnectionString = builder.Configuration.GetConnectionString("Database")!;
 string cacheConnectionString = builder.Configuration.GetConnectionString("Cache")!;
 
-builder.Services.AddInfrastructure(cacheConnectionString);
+builder.Services.AddInfrastructure([
+    TicketingModule.ConfigureConsumers
+], cacheConnectionString);
 
 builder.Configuration.AddModuleConfiguration(["events", "users", "ticketing"]);
 

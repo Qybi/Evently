@@ -1,5 +1,10 @@
 ﻿using Evently.Modules.Ticketing.Application.Carts;
+using Evently.Modules.Ticketing.Application.Customers;
+using Evently.Modules.Ticketing.Infrastructure.Queries;
+using Evently.Modules.Ticketing.Infrastructure.Repositories;
+using Evently.Modules.Ticketing.Presentation.Customers;
 using Evently.Shared.Presentation.Endpoints;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +21,12 @@ public static class TicketingModule
 
         return services;
     }
+
+    public static void ConfigureConsumers(IRegistrationConfigurator registrationConfigurator)
+    {
+        registrationConfigurator.AddConsumer<UserRegisteredIntegrationEventConsumer>();
+    }
+
 #pragma warning disable S1172
 #pragma warning disable IDE0060
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
@@ -23,5 +34,8 @@ public static class TicketingModule
 #pragma warning restore IDE0060
     {
         services.AddSingleton<CartService>();
+
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<ICustomerQueries, CustomerQueries>();
     }
 }
