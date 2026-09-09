@@ -23,6 +23,7 @@
     <Project Path="src/Modules/Ticketing/Evently.Modules.Ticketing.Domain/Evently.Modules.Ticketing.Domain.csproj" Id="d16116fc-60aa-4172-bb12-539ab5a00e30" />
     <Project Path="src/Modules/Ticketing/Evently.Modules.Ticketing.Infrastructure/Evently.Modules.Ticketing.Infrastructure.csproj" Id="39eb4981-b250-4ca4-9ee7-a0ab89fc728c" />
     <Project Path="src/Modules/Ticketing/Evently.Modules.Ticketing.Presentation/Evently.Modules.Ticketing.Presentation.csproj" Id="f0982307-5445-42dd-a9d0-c2648a933e7c" />
+    <Project Path="src/Modules/Ticketing/Evently.Modules.Ticketing.PublicApi/Evently.Modules.Ticketing.PublicApi.csproj" Id="e7a04d74-2216-42f9-81f0-7573931eb07d" />
   </Folder>
   <Folder Name="/src/Modules/Users/">
     <Project Path="src/Modules/Users/Evently.Modules.Users.Application/Evently.Modules.Users.Application.csproj" Id="8831e026-3ace-44c1-9f38-9cef94b9b231" />
