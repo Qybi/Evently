@@ -1,0 +1,12 @@
+﻿using Evently.Shared.Domain.Errors;
+
+namespace Evently.Modules.Ticketing.Domain.Tickets.Errors;
+
+public static class TicketErrors
+{
+    public static Error NotFound(Guid ticketId) =>
+        Error.NotFound("Tickets.NotFound", $"The ticket with the identifier {ticketId} was not found");
+
+    public static Error NotFound(string code) =>
+        Error.NotFound("Tickets.NotFound", $"The ticket with the code {code} was not found");
+}

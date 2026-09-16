@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Evently.Modules.Ticketing.Infrastructure.Customers;
+namespace Evently.Modules.Ticketing.Infrastructure.Database.Configurations;
 
 internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {

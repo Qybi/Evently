@@ -1,10 +1,24 @@
-﻿using Evently.Modules.Ticketing.Application.Carts;
+﻿using Evently.Modules.Ticketing.Application.Abstractions.Data;
+using Evently.Modules.Ticketing.Application.Abstractions.Payments;
+using Evently.Modules.Ticketing.Application.Carts;
 using Evently.Modules.Ticketing.Application.Customers;
+using Evently.Modules.Ticketing.Application.Events;
+using Evently.Modules.Ticketing.Application.Orders;
+using Evently.Modules.Ticketing.Application.Payments;
+using Evently.Modules.Ticketing.Application.Tickets;
+using Evently.Modules.Ticketing.Application.TicketTypes;
+using Evently.Modules.Ticketing.Infrastructure.Database;
+using Evently.Modules.Ticketing.Infrastructure.Events;
+using Evently.Modules.Ticketing.Infrastructure.Payments;
 using Evently.Modules.Ticketing.Infrastructure.Queries;
 using Evently.Modules.Ticketing.Infrastructure.Repositories;
+using Evently.Modules.Ticketing.Infrastructure.Tickets;
 using Evently.Modules.Ticketing.Presentation.Customers;
+using Evently.Shared.Infrastructure.Interceptors;
 using Evently.Shared.Presentation.Endpoints;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,9 +47,30 @@ public static class TicketingModule
 #pragma warning restore S1172
 #pragma warning restore IDE0060
     {
-        services.AddSingleton<CartService>();
+        services.AddDbContext<TicketingDbContext>((sp, options) =>
+            options
+                .UseNpgsql(
+                    configuration.GetConnectionString("Database"),
+                    npgsqlOptions => npgsqlOptions
+                        .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Ticketing))
+                .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
+                .UseSnakeCaseNamingConvention());
+
 
         services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<IEventRepository, EventRepository>();
+        services.AddScoped<ITicketTypeRepository, TicketTypeRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<ITicketRepository, TicketRepository>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+
         services.AddScoped<ICustomerQueries, CustomerQueries>();
+        services.AddScoped<ITicketQueries, TicketQueries>();
+        services.AddScoped<IOrderQueries, OrderQueries>();
+
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TicketingDbContext>());
+
+        services.AddSingleton<CartService>();
+        services.AddSingleton<IPaymentService, PaymentService>();
     }
 }

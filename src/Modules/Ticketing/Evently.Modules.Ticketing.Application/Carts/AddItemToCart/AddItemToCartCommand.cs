@@ -1,12 +1,12 @@
-﻿using Evently.Shared.Application.Messaging;
-using Evently.Shared.Domain;
-using Evently.Modules.Events.PublicApi;
-using Evently.Modules.Ticketing.Domain.Customers;
-using Evently.Modules.Ticketing.Domain.Events;
-using Evently.Modules.Users.PublicApi;
-using FluentValidation;
-using Evently.Modules.Ticketing.Application.Customers;
+﻿using Evently.Modules.Ticketing.Application.Customers;
 using Evently.Modules.Ticketing.Application.Customers.Queries.ViewModels;
+using Evently.Modules.Ticketing.Application.TicketTypes;
+using Evently.Modules.Ticketing.Domain.Customers;
+using Evently.Modules.Ticketing.Domain.TicketTypes;
+using Evently.Modules.Ticketing.Domain.TicketTypes.Errors;
+using Evently.Shared.Application.Messaging;
+using Evently.Shared.Domain;
+using FluentValidation;
 
 namespace Evently.Modules.Ticketing.Application.Carts.AddItemToCart;
 
@@ -22,19 +22,19 @@ internal sealed class AddItemToCartCommandValidator : AbstractValidator<AddItemT
     }
 }
 
-internal sealed class AddItemToCartCommandHandler(CartService cartService, ICustomerQueries customerQueries, IEventsApi eventsApi)
+internal sealed class AddItemToCartCommandHandler(CartService cartService, ICustomerRepository customerRepository, ITicketTypeRepository ticketTypeRepository)
     : ICommandHandler<AddItemToCartCommand>
 {
     public async Task<Result> Handle(AddItemToCartCommand request, CancellationToken cancellationToken)
     {
-        CustomerViewModel? customer = await customerQueries.GetCustomerByIdAsync(request.CustomerId, cancellationToken);
+        Customer? customer = await customerRepository.GetAsync(request.CustomerId, cancellationToken);
 
         if (customer is null)
         {
             return Result.Failure(CustomerErrors.NotFound(request.CustomerId));
         }
 
-        TicketTypePublicApiResponse? ticketType = await eventsApi.GetTicketTypeAsync(request.TicketTypeId, cancellationToken);
+        TicketType? ticketType = await ticketTypeRepository.GetAsync(request.TicketTypeId, cancellationToken);
 
         if (ticketType is null)
         {
