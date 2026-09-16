@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Evently.Shared.Application\Evently.Shared.Application.csproj" />
+  </ItemGroup>
+</Project>

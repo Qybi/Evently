@@ -1,6 +1,8 @@
 using Evently.Api.Extensions;
 using Evently.Api.Middleware;
 using Evently.Modules.Events.Infrastructure;
+using Evently.Modules.Ticketing.Infrastructure;
+using Evently.Modules.Users.Infrastructure;
 using Evently.Shared.Application;
 using Evently.Shared.Infrastructure;
 using Evently.Shared.Presentation.Endpoints;
@@ -31,20 +33,28 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
-builder.Services.AddApplication([Evently.Modules.Events.Application.AssemblyReference.Assembly]);
+builder.Services.AddApplication([
+    Evently.Modules.Events.Application.AssemblyReference.Assembly,
+    Evently.Modules.Users.Application.AssemblyReference.Assembly,
+    Evently.Modules.Ticketing.Application.AssemblyReference.Assembly
+]);
 
 string databaseConnectionString = builder.Configuration.GetConnectionString("Database")!;
 string cacheConnectionString = builder.Configuration.GetConnectionString("Cache")!;
 
-builder.Services.AddInfrastructure(cacheConnectionString);
+builder.Services.AddInfrastructure([
+    TicketingModule.ConfigureConsumers
+], cacheConnectionString);
 
-builder.Configuration.AddModuleConfiguration(["events"]);
+builder.Configuration.AddModuleConfiguration(["events", "users", "ticketing"]);
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(databaseConnectionString)
     .AddRedis(cacheConnectionString);
 
 builder.Services.AddEventsModule(builder.Configuration);
+builder.Services.AddUsersModule(builder.Configuration);
+builder.Services.AddTicketingModule(builder.Configuration);
 
 WebApplication app = builder.Build();
 
