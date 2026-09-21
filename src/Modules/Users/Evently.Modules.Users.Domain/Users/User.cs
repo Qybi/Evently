@@ -1,4 +1,5 @@
-﻿using Evently.Modules.Users.Domain.Users.DomainEvents;
+﻿using System.Collections.ObjectModel;
+using Evently.Modules.Users.Domain.Users.DomainEvents;
 using Evently.Shared.Domain;
 
 namespace Evently.Modules.Users.Domain.Users;
@@ -11,16 +12,22 @@ public sealed class User : Entity
     public string Email { get; private set; }
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
-    
-    public static User Create(string email, string firstName, string lastName)
+    public string IdentityId { get; private set; }
+    private readonly List<Role> _roles = [];
+    public IReadOnlyCollection<Role> Roles => new ReadOnlyCollection<Role>(_roles);
+
+    public static User Create(string email, string firstName, string lastName, string identityId)
     {
         var user = new User
         {
             Id = Guid.NewGuid(),
             Email = email,
             FirstName = firstName,
-            LastName = lastName
+            LastName = lastName,
+            IdentityId = identityId
         };
+
+        user._roles.Add(Role.Member);
 
         user.Raise(new UserRegisteredDomainEvent(user.Id));
 

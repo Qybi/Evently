@@ -1,6 +1,8 @@
-﻿using Evently.Modules.Users.Application.Users.Queries.GetUser;
+﻿using System.Security.Claims;
+using Evently.Modules.Users.Application.Users.Queries.GetUser;
 using Evently.Modules.Users.Application.Users.Queries.ViewModels;
 using Evently.Shared.Domain;
+using Evently.Shared.Infrastructure.Authentication;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
 using MediatR;
@@ -14,12 +16,13 @@ internal sealed class GetUserProfile : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("users/{id}/profile", async (Guid id, ISender sender) =>
+        app.MapGet("users/profile", async (ClaimsPrincipal claims, ISender sender) =>
         {
-            Result<UserViewModel> result = await sender.Send(new GetUserQuery(id));
+            Result<UserViewModel> result = await sender.Send(new GetUserQuery(claims.GetUserId()));
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })
+        .RequireAuthorization("users:read")
         .WithTags(Tags.Users);
     }
 }
