@@ -22,6 +22,7 @@ internal sealed class AddToCart : IEndpoint
                 );
 
         })
+        .RequireAuthorization()
         .WithTags(Tags.Carts);
     }
 
