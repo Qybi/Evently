@@ -51,7 +51,8 @@ public static class InfrastructureConfiguration
                 configureConsumer(configure);
             }
 
-            configure.SetKebabCaseEndpointNameFormatter();
+            // Include the namespace so same-named consumers in different modules get separate endpoints
+            configure.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
 
             configure.UsingInMemory((context, cfg) =>
             {
