@@ -11,6 +11,13 @@
     <Project Path="src/API/Evently.Api/Evently.Api.csproj" />
   </Folder>
   <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Attendance/">
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.Application/Evently.Modules.Attendance.Application.csproj" Id="1763be3a-1ff4-4e84-a85e-9c51393c11fd" />
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.Domain/Evently.Modules.Attendance.Domain.csproj" Id="e48e1b2b-33b6-44d3-aefa-1a4e5b1e59ec" />
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.Infrastructure/Evently.Modules.Attendance.Infrastructure.csproj" Id="eaf51880-fe4d-4dc9-8276-be815ee59b84" />
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.IntegrationEvents/Evently.Modules.Attendance.IntegrationEvents.csproj" Id="2c73b68e-7b1a-4aa4-9ee1-48a5a97fbbe5" />
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.Presentation/Evently.Modules.Attendance.Presentation.csproj" Id="bc14dd96-ee67-4ec2-8c6f-89aa9426e8a1" />
+  </Folder>
   <Folder Name="/src/Modules/Events/">
     <Project Path="src/Modules/Events/Evently.Modules.Events.Application/Evently.Modules.Events.Application.csproj" Id="9a5a7c57-177f-4446-b955-e1826cdadc46" />
     <Project Path="src/Modules/Events/Evently.Modules.Events.Domain/Evently.Modules.Events.Domain.csproj" Id="23fe6335-2143-4dae-9323-1c44b0a89416" />
