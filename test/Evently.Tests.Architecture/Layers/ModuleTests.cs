@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using Evently.Modules.Attendance.Domain.Attendees;
+using Evently.Modules.Attendance.Infrastructure;
 using Evently.Modules.Events.Domain.Events;
 using Evently.Modules.Events.Infrastructure;
 using Evently.Modules.Ticketing.Domain.Orders;
@@ -93,34 +95,31 @@ public class ModuleTests : BaseTest
             .ShouldBeSuccessful();
     }
 
-    // Disabled until the Attendance module exists
-#pragma warning disable S125
-    //[Fact]
-    //public void AttendanceModule_ShouldNotHaveDependencyOn_AnyOtherModule()
-    //{
-    //    string[] otherModules = [UsersNamespace, TicketingNamespace, EventsNamespace];
-    //    string[] integrationEventsModules =
-    //    [
-    //        UsersIntegrationEventsNamespace,
-    //        TicketingIntegrationEventsNamespace,
-    //        EventsIntegrationEventsNamespace
-    //    ];
+    [Fact]
+    public void AttendanceModule_ShouldNotHaveDependencyOn_AnyOtherModule()
+    {
+        string[] otherModules = [UsersNamespace, TicketingNamespace, EventsNamespace];
+        string[] integrationEventsModules =
+        [
+            UsersIntegrationEventsNamespace,
+            TicketingIntegrationEventsNamespace,
+            EventsIntegrationEventsNamespace
+        ];
 
-    //    List<Assembly> attendanceAssemblies =
-    //    [
-    //        typeof(Attendee).Assembly,
-    //        Modules.Attendance.Application.AssemblyReference.Assembly,
-    //        Modules.Attendance.Presentation.AssemblyReference.Assembly,
-    //        typeof(AttendanceModule).Assembly
-    //    ];
+        List<Assembly> attendanceAssemblies =
+        [
+            typeof(Attendee).Assembly,
+            Modules.Attendance.Application.AssemblyReference.Assembly,
+            Modules.Attendance.Presentation.AssemblyReference.Assembly,
+            typeof(AttendanceModule).Assembly
+        ];
 
-    //    Types.InAssemblies(attendanceAssemblies)
-    //        .That()
-    //        .DoNotHaveDependencyOnAny(integrationEventsModules)
-    //        .Should()
-    //        .NotHaveDependencyOnAny(otherModules)
-    //        .GetResult()
-    //        .ShouldBeSuccessful();
-    //}
-#pragma warning restore S125
+        Types.InAssemblies(attendanceAssemblies)
+            .That()
+            .DoNotHaveDependencyOnAny(integrationEventsModules)
+            .Should()
+            .NotHaveDependencyOnAny(otherModules)
+            .GetResult()
+            .ShouldBeSuccessful();
+    }
 }
