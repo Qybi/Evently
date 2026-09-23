@@ -5,6 +5,7 @@ using Evently.Modules.Attendance.Application.Events;
 using Evently.Modules.Attendance.Application.Tickets;
 using Evently.Modules.Attendance.Infrastructure.Authentication;
 using Evently.Modules.Attendance.Infrastructure.Database;
+using Evently.Modules.Attendance.Infrastructure.Queries;
 using Evently.Modules.Attendance.Infrastructure.Repositories;
 using Evently.Shared.Infrastructure.Interceptors;
 using Evently.Shared.Presentation.Endpoints;
@@ -43,6 +44,9 @@ public static class AttendanceModule
         services.AddScoped<IAttendeeRepository, AttendeeRepository>();
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<ITicketRepository, TicketRepository>();
+
+        services.AddScoped<IAttendeeQueries, AttendeeQueries>();
+        services.AddScoped<ITicketQueries, TicketQueries>();
 
         services.AddScoped<IAttendanceContext, AttendanceContext>();
     }
