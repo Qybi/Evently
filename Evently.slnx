@@ -36,6 +36,9 @@
     <Project Path="src/Shared/Evently.Shared.Infrastructure/Evently.Shared.Infrastructure.csproj" Id="cfcdd96c-3d50-49e5-929b-09e0d92284cb" />
     <Project Path="src/Shared/Evently.Shared.Presentation/Evently.Shared.Presentation.csproj" Id="b91b2e1c-eb71-44b9-9fde-ac8249eae8f5" />
   </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Evently.Tests.Architecture/Evently.Tests.Architecture.csproj" />
+  </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
