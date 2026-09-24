@@ -46,6 +46,19 @@
   <Folder Name="/test/">
     <Project Path="test/Evently.Tests.Architecture/Evently.Tests.Architecture.csproj" />
   </Folder>
+  <Folder Name="/test/Modules/" />
+  <Folder Name="/test/Modules/Attendance/">
+    <Project Path="test/Modules/Attendance/Evently.Tests.Modules.Attendance.ArchitectureTests/Evently.Tests.Modules.Attendance.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/test/Modules/Events/">
+    <Project Path="test/Modules/Events/Evently.Tests.Modules.Events.ArchitectureTests/Evently.Tests.Modules.Events.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/test/Modules/Ticketing/">
+    <Project Path="test/Modules/Ticketing/Evently.Tests.Modules.Ticketing.ArchitectureTests/Evently.Tests.Modules.Ticketing.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/test/Modules/Users/">
+    <Project Path="test/Modules/Users/Evently.Tests.Modules.Users.ArchitectureTests/Evently.Tests.Modules.Users.ArchitectureTests.csproj" />
+  </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
