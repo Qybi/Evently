@@ -1,4 +1,4 @@
-﻿using Evently.Common.Application.EventBus;
+﻿using Evently.Shared.Application.EventBus;
 
 namespace Evently.Modules.Ticketing.IntegrationEvents;
 
