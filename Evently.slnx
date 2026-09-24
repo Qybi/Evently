@@ -11,6 +11,13 @@
     <Project Path="src/API/Evently.Api/Evently.Api.csproj" />
   </Folder>
   <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Attendance/">
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.Application/Evently.Modules.Attendance.Application.csproj" Id="1763be3a-1ff4-4e84-a85e-9c51393c11fd" />
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.Domain/Evently.Modules.Attendance.Domain.csproj" Id="e48e1b2b-33b6-44d3-aefa-1a4e5b1e59ec" />
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.Infrastructure/Evently.Modules.Attendance.Infrastructure.csproj" Id="eaf51880-fe4d-4dc9-8276-be815ee59b84" />
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.IntegrationEvents/Evently.Modules.Attendance.IntegrationEvents.csproj" Id="2c73b68e-7b1a-4aa4-9ee1-48a5a97fbbe5" />
+    <Project Path="src/Modules/Attendance/Evently.Modules.Attendance.Presentation/Evently.Modules.Attendance.Presentation.csproj" Id="bc14dd96-ee67-4ec2-8c6f-89aa9426e8a1" />
+  </Folder>
   <Folder Name="/src/Modules/Events/">
     <Project Path="src/Modules/Events/Evently.Modules.Events.Application/Evently.Modules.Events.Application.csproj" Id="9a5a7c57-177f-4446-b955-e1826cdadc46" />
     <Project Path="src/Modules/Events/Evently.Modules.Events.Domain/Evently.Modules.Events.Domain.csproj" Id="23fe6335-2143-4dae-9323-1c44b0a89416" />
@@ -35,6 +42,22 @@
     <Project Path="src/Shared/Evently.Shared.Domain/Evently.Shared.Domain.csproj" Id="6d81f49c-34ff-4439-a9b2-8030ab70464c" />
     <Project Path="src/Shared/Evently.Shared.Infrastructure/Evently.Shared.Infrastructure.csproj" Id="cfcdd96c-3d50-49e5-929b-09e0d92284cb" />
     <Project Path="src/Shared/Evently.Shared.Presentation/Evently.Shared.Presentation.csproj" Id="b91b2e1c-eb71-44b9-9fde-ac8249eae8f5" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Evently.Tests.Architecture/Evently.Tests.Architecture.csproj" />
+  </Folder>
+  <Folder Name="/test/Modules/" />
+  <Folder Name="/test/Modules/Attendance/">
+    <Project Path="test/Modules/Attendance/Evently.Tests.Modules.Attendance.ArchitectureTests/Evently.Tests.Modules.Attendance.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/test/Modules/Events/">
+    <Project Path="test/Modules/Events/Evently.Tests.Modules.Events.ArchitectureTests/Evently.Tests.Modules.Events.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/test/Modules/Ticketing/">
+    <Project Path="test/Modules/Ticketing/Evently.Tests.Modules.Ticketing.ArchitectureTests/Evently.Tests.Modules.Ticketing.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/test/Modules/Users/">
+    <Project Path="test/Modules/Users/Evently.Tests.Modules.Users.ArchitectureTests/Evently.Tests.Modules.Users.ArchitectureTests.csproj" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
