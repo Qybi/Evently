@@ -5,6 +5,7 @@ using Evently.Modules.Attendance.Application.Events;
 using Evently.Modules.Attendance.Application.Tickets;
 using Evently.Modules.Attendance.Infrastructure.Authentication;
 using Evently.Modules.Attendance.Infrastructure.Database;
+using Evently.Modules.Attendance.Infrastructure.Outbox;
 using Evently.Modules.Attendance.Infrastructure.Queries;
 using Evently.Modules.Attendance.Infrastructure.Repositories;
 using Evently.Modules.Attendance.Presentation.Attendees;
@@ -15,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 
 namespace Evently.Modules.Attendance.Infrastructure;
 
@@ -56,5 +58,9 @@ public static class AttendanceModule
         services.AddScoped<ITicketQueries, TicketQueries>();
 
         services.AddScoped<IAttendanceContext, AttendanceContext>();
+
+        services.Configure<OutboxOptions>(configuration.GetSection("Attendance:Outbox"));
+
+        services.AddQuartz(quartz => quartz.AddProcessOutboxJob());
     }
 }
