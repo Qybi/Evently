@@ -9,6 +9,7 @@ using Evently.Shared.Infrastructure.Interceptors;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Quartz;
 using StackExchange.Redis;
 
 namespace Evently.Shared.Infrastructure;
@@ -24,6 +25,9 @@ public static class InfrastructureConfiguration
         services.TryAddSingleton<PublishDomainEventsInterceptor>();
 
         services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+        services.AddQuartz();
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         try
         {
