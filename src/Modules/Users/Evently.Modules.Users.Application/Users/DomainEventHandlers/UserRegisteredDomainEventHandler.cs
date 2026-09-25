@@ -8,11 +8,11 @@ using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using MediatR;
 
-namespace Evently.Modules.Users.Application.Users.Commands.RegisterUser;
+namespace Evently.Modules.Users.Application.Users.DomainEventHandlers;
 
-internal sealed class UserRegisteredDomainEventHandler(ISender sender, IEventBus eventBus) : IDomainEventHandler<UserRegisteredDomainEvent>
+internal sealed class UserRegisteredDomainEventHandler(ISender sender, IEventBus eventBus) : DomainEventHandler<UserRegisteredDomainEvent>
 {
-    public async Task Handle(UserRegisteredDomainEvent notification, CancellationToken cancellationToken)
+    public override async Task Handle(UserRegisteredDomainEvent notification, CancellationToken cancellationToken = default)
     {
         Result<UserViewModel> result = await sender.Send(new GetUserQuery(notification.UserId), cancellationToken);
 
