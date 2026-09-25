@@ -9,9 +9,9 @@ namespace Evently.Modules.Events.Infrastructure.Queries;
 internal sealed class TicketTypeQueries(EventsDbContext context) : ITicketTypeQueries
 {
     // Read side: no tracking, projected in SQL, never materializes the entity.
-    public Task<TicketTypeViewModel?> GetAsync(Guid ticketTypeId, CancellationToken cancellationToken = default)
+    public async Task<TicketTypeViewModel?> GetAsync(Guid ticketTypeId, CancellationToken cancellationToken = default)
     {
-        return context.TicketTypes
+        return await context.TicketTypes
             .AsNoTracking()
             .Where(t => t.Id == ticketTypeId)
             .ProjectToViewModel()

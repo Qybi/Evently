@@ -9,18 +9,18 @@ namespace Evently.Modules.Users.Infrastructure.Queries;
 
 internal sealed class UserQueries(UsersDbContext context) : IUserQueries
 {
-    public Task<UserViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<UserViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return context.Users
+        return await context.Users
             .AsNoTracking()
             .Where(e => e.Id == id)
             .ProjectToViewModel()
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public Task<List<UserPermissionViewModel>> GetPermissionsAsync(string identityId, CancellationToken cancellationToken = default)
+    public async Task<List<UserPermissionViewModel>> GetPermissionsAsync(string identityId, CancellationToken cancellationToken = default)
     {
-        return (
+        return await (
                 from u in context.Users
                 join ur in context.Set<Dictionary<string, object>>("RoleUser")
                     on u.Id equals EF.Property<Guid>(ur, "UserId")

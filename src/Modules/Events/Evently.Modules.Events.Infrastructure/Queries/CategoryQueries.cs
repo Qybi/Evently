@@ -16,9 +16,9 @@ internal sealed class CategoryQueries(EventsDbContext context) : ICategoryQuerie
             .ToListAsync(cancellationToken);
     }
 
-    public Task<CategoryViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<CategoryViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return context.Categories
+        return await context.Categories
             .AsNoTracking()
             .Where(c => c.Id == id)
             .ProjectToViewModel()
