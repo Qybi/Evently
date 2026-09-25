@@ -1,5 +1,6 @@
 using Evently.Modules.Events.Api.Database;
 using Evently.Shared.Application.Clock;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain.DomainEvents;
 using Evently.Shared.Infrastructure.Outbox;
 using Evently.Shared.Infrastructure.Serialization;
@@ -41,9 +42,15 @@ internal sealed class ProcessOutboxJob(EventsDbContext eventsDbContext,
 
                 await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
 
-                IPublisher publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
+                IEnumerable<IDomainEventHandler> domainEventHandlers = DomainEventHandlersFactory.GetHandlers(
+                    domainEvent.GetType(),
+                    scope.ServiceProvider,
+                    Application.AssemblyReference.Assembly);
 
-                await publisher.Publish(domainEvent, cancellationToken);
+                foreach (IDomainEventHandler domainEventHandler in domainEventHandlers)
+                {
+                    await domainEventHandler.Handle(domainEvent, cancellationToken);
+                }
             }
             catch (Exception caughtException)
             {
