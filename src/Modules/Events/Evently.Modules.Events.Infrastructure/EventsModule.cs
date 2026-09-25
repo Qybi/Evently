@@ -4,6 +4,7 @@ using Evently.Modules.Events.Application.Categories;
 using Evently.Modules.Events.Application.Events;
 using Evently.Modules.Events.Application.TicketTypes;
 using Evently.Modules.Events.Infrastructure.Database;
+using Evently.Modules.Events.Infrastructure.Outbox;
 using Evently.Modules.Events.Infrastructure.Queries;
 using Evently.Modules.Events.Infrastructure.Repositories;
 using Evently.Shared.Infrastructure.Outbox;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 
 namespace Evently.Modules.Events.Infrastructure;
 
@@ -48,5 +50,9 @@ public static class EventsModule
         services.AddScoped<IEventQueries, EventQueries>();
         services.AddScoped<ICategoryQueries, CategoryQueries>();
         services.AddScoped<ITicketTypeQueries, TicketTypeQueries>();
+
+        services.Configure<OutboxOptions>(configuration.GetSection("Events:Outbox"));
+
+        services.AddQuartz(quartz => quartz.AddProcessOutboxJob());
     }
 }
