@@ -9,6 +9,7 @@ using Evently.Modules.Ticketing.Application.Tickets;
 using Evently.Modules.Ticketing.Application.TicketTypes;
 using Evently.Modules.Ticketing.Infrastructure.Database;
 using Evently.Modules.Ticketing.Infrastructure.Events;
+using Evently.Modules.Ticketing.Infrastructure.Outbox;
 using Evently.Modules.Ticketing.Infrastructure.Payments;
 using Evently.Modules.Ticketing.Infrastructure.Queries;
 using Evently.Modules.Ticketing.Infrastructure.Repositories;
@@ -21,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 
 namespace Evently.Modules.Ticketing.Infrastructure;
 
@@ -72,5 +74,9 @@ public static class TicketingModule
 
         services.AddSingleton<CartService>();
         services.AddSingleton<IPaymentService, PaymentService>();
+
+        services.Configure<OutboxOptions>(configuration.GetSection("Ticketing:Outbox"));
+
+        services.AddQuartz(quartz => quartz.AddProcessOutboxJob());
     }
 }
