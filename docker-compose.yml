@@ -13,7 +13,7 @@ services:
         condition: service_healthy
 
   evently.database:
-    image: postgres:latest
+    image: postgres:18
     container_name: Evently.Postgres
     environment:
       - POSTGRES_DB=evently
