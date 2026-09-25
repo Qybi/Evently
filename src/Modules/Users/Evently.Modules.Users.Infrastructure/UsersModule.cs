@@ -7,7 +7,7 @@ using Evently.Modules.Users.Infrastructure.Identity;
 using Evently.Modules.Users.Infrastructure.Queries;
 using Evently.Modules.Users.Infrastructure.Repositories;
 using Evently.Shared.Application.Authorization;
-using Evently.Shared.Infrastructure.Interceptors;
+using Evently.Shared.Infrastructure.Outbox;
 using Evently.Shared.Presentation.Endpoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -55,7 +55,7 @@ public static class UsersModule
                     npgsqlOptions => npgsqlOptions
                         .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Users))
                 .UseSnakeCaseNamingConvention()
-                .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>()));
+                .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UsersDbContext>());
 

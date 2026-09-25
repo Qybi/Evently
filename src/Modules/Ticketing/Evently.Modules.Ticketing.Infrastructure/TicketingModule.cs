@@ -14,7 +14,7 @@ using Evently.Modules.Ticketing.Infrastructure.Queries;
 using Evently.Modules.Ticketing.Infrastructure.Repositories;
 using Evently.Modules.Ticketing.Infrastructure.Tickets;
 using Evently.Modules.Ticketing.Presentation.Customers;
-using Evently.Shared.Infrastructure.Interceptors;
+using Evently.Shared.Infrastructure.Outbox;
 using Evently.Shared.Presentation.Endpoints;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +53,7 @@ public static class TicketingModule
                     configuration.GetConnectionString("Database"),
                     npgsqlOptions => npgsqlOptions
                         .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Ticketing))
-                .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
+                .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>())
                 .UseSnakeCaseNamingConvention());
 
 

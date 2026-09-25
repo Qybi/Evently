@@ -5,7 +5,7 @@ using Evently.Shared.Infrastructure.Authentication;
 using Evently.Shared.Infrastructure.Authorization;
 using Evently.Shared.Infrastructure.Caching;
 using Evently.Shared.Infrastructure.Clock;
-using Evently.Shared.Infrastructure.Interceptors;
+using Evently.Shared.Infrastructure.Outbox;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -22,7 +22,7 @@ public static class InfrastructureConfiguration
 
         services.AddAuthorizationInternal();
 
-        services.TryAddSingleton<PublishDomainEventsInterceptor>();
+        services.TryAddSingleton<InsertOutboxMessagesInterceptor>();
 
         services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
 
