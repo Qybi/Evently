@@ -4,6 +4,7 @@ using Evently.Modules.Users.Application.Users;
 using Evently.Modules.Users.Infrastructure.Authorization;
 using Evently.Modules.Users.Infrastructure.Database;
 using Evently.Modules.Users.Infrastructure.Identity;
+using Evently.Modules.Users.Infrastructure.Outbox;
 using Evently.Modules.Users.Infrastructure.Queries;
 using Evently.Modules.Users.Infrastructure.Repositories;
 using Evently.Shared.Application.Authorization;
@@ -14,6 +15,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Quartz;
 
 namespace Evently.Modules.Users.Infrastructure;
 
@@ -62,5 +64,9 @@ public static class UsersModule
         services.AddScoped<IUserRepository, UserRepository>();
 
         services.AddScoped<IUserQueries, UserQueries>();
+
+        services.Configure<OutboxOptions>(configuration.GetSection("Users:Outbox"));
+
+        services.AddQuartz(quartz => quartz.AddProcessOutboxJob());
     }
 }
