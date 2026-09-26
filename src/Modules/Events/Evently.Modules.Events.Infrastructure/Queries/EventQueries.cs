@@ -1,8 +1,8 @@
-using Evently.Modules.Events.Api.Database;
 using Evently.Modules.Events.Application.Events;
 using Evently.Modules.Events.Application.Events.Mappers;
 using Evently.Modules.Events.Application.Events.Queries.ViewModels;
 using Evently.Modules.Events.Domain.Events;
+using Evently.Modules.Events.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evently.Modules.Events.Infrastructure.Queries;
@@ -10,13 +10,28 @@ namespace Evently.Modules.Events.Infrastructure.Queries;
 internal sealed class EventQueries(EventsDbContext context) : IEventQueries
 {
     // Read side: no tracking, projected in SQL, never materializes the entity.
-    public Task<EventViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<EventViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return context.Events
+        EventViewModel? @event = await context.Events
             .AsNoTracking()
             .Where(e => e.Id == id)
             .ProjectToViewModel()
             .SingleOrDefaultAsync(cancellationToken);
+
+        if (@event is null)
+        {
+            return null;
+        }
+
+        List<GetEventTicketTypeViewModel> ticketTypes = await context.TicketTypes
+            .AsNoTracking()
+            .Where(t => t.EventId == id)
+            .Select(t => new GetEventTicketTypeViewModel(t.Id, t.Name, t.Price, t.Currency, t.Quantity))
+            .ToListAsync(cancellationToken);
+
+        @event.TicketTypes.AddRange(ticketTypes);
+
+        return @event;
     }
 
     public async Task<IReadOnlyCollection<EventViewModel>> GetEventsAsync(CancellationToken cancellationToken = default)

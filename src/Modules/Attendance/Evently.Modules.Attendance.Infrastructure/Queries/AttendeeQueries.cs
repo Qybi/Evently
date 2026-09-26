@@ -8,9 +8,9 @@ namespace Evently.Modules.Attendance.Infrastructure.Queries;
 
 internal sealed class AttendeeQueries(AttendanceDbContext context) : IAttendeeQueries
 {
-    public Task<AttendeeViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<AttendeeViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return context.Attendees
+        return await context.Attendees
             .AsNoTracking()
             .Where(a => a.Id == id)
             .ProjectToViewModel()

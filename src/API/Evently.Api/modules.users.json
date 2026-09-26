@@ -6,6 +6,14 @@
       "ConfidentialClientId": "evently-confidential-client",
       "ConfidentialClientSecret": "",
       "PublicClientId": "evently-public-client"
+    },
+    "Outbox": {
+      "IntervalInSeconds": 5,
+      "BatchSize": 50
+    },
+    "Inbox": {
+      "IntervalInSeconds": 5,
+      "BatchSize": 50
     }
   }
 }

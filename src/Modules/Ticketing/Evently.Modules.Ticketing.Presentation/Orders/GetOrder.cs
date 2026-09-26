@@ -1,12 +1,12 @@
-﻿using Evently.Shared.Domain;
-using Evently.Shared.Presentation.Endpoints;
+﻿using Evently.Modules.Ticketing.Application.Orders.Queries.GetOrder;
+using Evently.Modules.Ticketing.Application.Orders.ViewModels;
+using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
-using Evently.Modules.Ticketing.Application.Orders.Queries.GetOrder;
+using Evently.Shared.Presentation.Endpoints;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Evently.Modules.Ticketing.Application.Orders.ViewModels;
 
 namespace Evently.Modules.Ticketing.Presentation.Orders;
 
@@ -20,7 +20,7 @@ internal sealed class GetOrder : IEndpoint
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })
-        .RequireAuthorization()
+        .RequireAuthorization(Permissions.GetOrders)
         .WithTags(Tags.Orders);
     }
 }

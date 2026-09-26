@@ -8,4 +8,7 @@ public sealed record EventViewModel(
     string Location,
     DateTime StartsAtUtc,
     DateTime? EndsAtUtc
-);
+)
+{
+    public List<GetEventTicketTypeViewModel> TicketTypes { get; } = [];
+}

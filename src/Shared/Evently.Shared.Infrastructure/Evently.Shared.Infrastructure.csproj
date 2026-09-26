@@ -11,7 +11,10 @@
 		<PackageReference Include="MassTransit" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
 		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
+		<PackageReference Include="Newtonsoft.Json" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+		<PackageReference Include="Quartz.Extensions.Hosting" />
+		<PackageReference Include="Scrutor" />
 	</ItemGroup>
 
 </Project>
