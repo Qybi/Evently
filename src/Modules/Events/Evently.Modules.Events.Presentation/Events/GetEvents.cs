@@ -20,7 +20,7 @@ internal sealed class GetEvents : IEndpoint
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })
-        .RequireAuthorization()
+        .RequireAuthorization(Permissions.GetEvents)
         .WithTags(Tags.Events);
     }
 }

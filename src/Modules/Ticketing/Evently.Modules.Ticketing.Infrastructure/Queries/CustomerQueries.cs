@@ -8,9 +8,9 @@ namespace Evently.Modules.Ticketing.Infrastructure.Queries;
 
 internal sealed class CustomerQueries(TicketingDbContext context) : ICustomerQueries
 {
-    public Task<CustomerViewModel?> GetCustomerByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<CustomerViewModel?> GetCustomerByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return context.Customers
+        return await context.Customers
             .AsNoTracking()
             .Where(c => c.Id == id)
             .ProjectToViewModel()

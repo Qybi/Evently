@@ -1,4 +1,5 @@
-﻿using Evently.Modules.Ticketing.Application.Carts.AddItemToCart;
+﻿using Evently.Modules.Ticketing.Application.Abstractions.Authentication;
+using Evently.Modules.Ticketing.Application.Carts.AddItemToCart;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
@@ -13,23 +14,24 @@ internal sealed class AddToCart : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("/carts/add", async (AddItemToCartCommand command, ISender sender) =>
+        app.MapPut("carts/add", async (Request request, ICustomerContext customerContext, ISender sender) =>
         {
-            Result result = await sender.Send(command);
-            return result.Match(
-                () => Results.Ok(),
-                ApiResults.Problem
-                );
+            Result result = await sender.Send(
+                new AddItemToCartCommand(
+                    customerContext.CustomerId,
+                    request.TicketTypeId,
+                    request.Quantity));
 
+            return result.Match(() => Results.Ok(), ApiResults.Problem);
         })
-        .RequireAuthorization()
+        .RequireAuthorization(Permissions.AddToCart)
         .WithTags(Tags.Carts);
     }
 
     internal sealed class Request
     {
-        public Guid CustomerId { get; init; }
         public Guid TicketTypeId { get; init; }
+
         public decimal Quantity { get; init; }
     }
 }

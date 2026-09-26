@@ -1,7 +1,7 @@
-using Evently.Modules.Events.Api.Database;
 using Evently.Modules.Events.Application.Categories;
 using Evently.Modules.Events.Application.Categories.Mappers;
 using Evently.Modules.Events.Application.Categories.Queries.ViewModels;
+using Evently.Modules.Events.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evently.Modules.Events.Infrastructure.Queries;
@@ -16,9 +16,9 @@ internal sealed class CategoryQueries(EventsDbContext context) : ICategoryQuerie
             .ToListAsync(cancellationToken);
     }
 
-    public Task<CategoryViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<CategoryViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return context.Categories
+        return await context.Categories
             .AsNoTracking()
             .Where(c => c.Id == id)
             .ProjectToViewModel()
