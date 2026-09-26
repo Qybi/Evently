@@ -1,8 +1,8 @@
-using Evently.Modules.Events.Api.Database;
 using Evently.Modules.Events.Application.Events;
 using Evently.Modules.Events.Application.Events.Mappers;
 using Evently.Modules.Events.Application.Events.Queries.ViewModels;
 using Evently.Modules.Events.Domain.Events;
+using Evently.Modules.Events.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evently.Modules.Events.Infrastructure.Queries;

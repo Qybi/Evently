@@ -7,6 +7,7 @@ using Evently.Modules.Ticketing.Domain.Payments;
 using Evently.Modules.Ticketing.Domain.Tickets;
 using Evently.Modules.Ticketing.Domain.TicketTypes;
 using Evently.Modules.Ticketing.Infrastructure.Database.Configurations;
+using Evently.Shared.Infrastructure.Inbox;
 using Evently.Shared.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -30,6 +31,9 @@ public sealed class TicketingDbContext(DbContextOptions<TicketingDbContext> opti
 
         modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
         modelBuilder.ApplyConfiguration(new OutboxMessageConsumerConfiguration());
+
+        modelBuilder.ApplyConfiguration(new InboxMessageConfiguration());
+        modelBuilder.ApplyConfiguration(new InboxMessageConsumerConfiguration());
 
         modelBuilder.ApplyConfiguration(new CustomerConfiguration());
         modelBuilder.ApplyConfiguration(new EventConfiguration());

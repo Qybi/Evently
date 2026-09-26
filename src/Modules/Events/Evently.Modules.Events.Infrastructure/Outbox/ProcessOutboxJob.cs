@@ -1,4 +1,4 @@
-using Evently.Modules.Events.Api.Database;
+using Evently.Modules.Events.Infrastructure.Database;
 using Evently.Shared.Application.Clock;
 using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain.DomainEvents;

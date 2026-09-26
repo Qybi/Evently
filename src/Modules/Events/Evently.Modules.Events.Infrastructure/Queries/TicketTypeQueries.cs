@@ -1,7 +1,7 @@
-using Evently.Modules.Events.Api.Database;
 using Evently.Modules.Events.Application.TicketTypes;
 using Evently.Modules.Events.Application.TicketTypes.Mappers;
 using Evently.Modules.Events.Application.TicketTypes.Queries.ViewModels;
+using Evently.Modules.Events.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evently.Modules.Events.Infrastructure.Queries;
