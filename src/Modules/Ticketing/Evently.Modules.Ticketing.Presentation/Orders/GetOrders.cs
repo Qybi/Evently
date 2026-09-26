@@ -1,4 +1,5 @@
-﻿using Evently.Modules.Ticketing.Application.Orders.Queries.GetOrder;
+﻿using Evently.Modules.Ticketing.Application.Abstractions.Authentication;
+using Evently.Modules.Ticketing.Application.Orders.Queries.GetOrders;
 using Evently.Modules.Ticketing.Application.Orders.ViewModels;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
@@ -10,13 +11,14 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Evently.Modules.Ticketing.Presentation.Orders;
 
-internal sealed class GetOrder : IEndpoint
+internal sealed class GetOrders : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("orders/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("orders", async (ICustomerContext customerContext, ISender sender) =>
         {
-            Result<GetOrderViewModel> result = await sender.Send(new GetOrderQuery(id));
+            Result<IReadOnlyCollection<GetOrdersViewModel>> result = await sender.Send(
+                new GetOrdersQuery(customerContext.CustomerId));
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })
