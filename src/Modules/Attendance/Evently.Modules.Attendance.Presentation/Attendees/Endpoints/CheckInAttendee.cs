@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
-namespace Evently.Modules.Attendance.Presentation.Attendees;
+namespace Evently.Modules.Attendance.Presentation.Attendees.Endpoints;
 
 internal sealed class CheckInAttendee : IEndpoint
 {
@@ -22,7 +22,7 @@ internal sealed class CheckInAttendee : IEndpoint
 
             return result.Match(Results.NoContent, ApiResults.Problem);
         })
-        .RequireAuthorization("tickets:check-in")
+        .RequireAuthorization(Permissions.CheckInTicket)
         .WithTags(Tags.Attendees);
     }
 
