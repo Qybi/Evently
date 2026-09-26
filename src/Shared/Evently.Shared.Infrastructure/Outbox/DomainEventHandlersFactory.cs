@@ -8,7 +8,7 @@ namespace Evently.Shared.Infrastructure.Outbox;
 public static class DomainEventHandlersFactory
 {
     // Process-wide cache: (module assembly + event type) -> handler types. Concurrent because outbox jobs can run in parallel.
-    private static readonly ConcurrentDictionary<(Assembly Assembly, Type EventType), Type[]> HandlersDictionary = new();
+    private static readonly ConcurrentDictionary<(Assembly Assembly, Type DomainEventType), Type[]> HandlersDictionary = new();
 
     public static IEnumerable<IDomainEventHandler> GetHandlers(Type type, IServiceProvider serviceProvider, Assembly assembly)
     {
@@ -39,6 +39,8 @@ public static class DomainEventHandlersFactory
     }
 }
 
+
+#pragma warning disable S125 // Sections of code should not be commented out
 /*
 Alternative implementation (reference only):
 - static lambda reads assembly/type from the key: no closure allocated per call
@@ -69,3 +71,4 @@ public static class DomainEventHandlersFactory
     }
 }
 */
+#pragma warning restore S125 // Sections of code should not be commented out
