@@ -4,7 +4,6 @@ using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain.DomainEvents;
 using Evently.Shared.Infrastructure.Outbox;
 using Evently.Shared.Infrastructure.Serialization;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
