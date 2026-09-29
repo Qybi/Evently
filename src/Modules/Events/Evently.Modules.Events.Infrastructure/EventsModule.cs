@@ -7,10 +7,12 @@ using Evently.Modules.Events.Infrastructure.Inbox;
 using Evently.Modules.Events.Infrastructure.Outbox;
 using Evently.Modules.Events.Infrastructure.Queries;
 using Evently.Modules.Events.Infrastructure.Repositories;
+using Evently.Modules.Events.Presentation.Events.CancelEventSaga;
 using Evently.Shared.Application.EventBus;
 using Evently.Shared.Application.Messaging;
 using Evently.Shared.Infrastructure.Outbox;
 using Evently.Shared.Presentation.Endpoints;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -29,10 +31,18 @@ public static class EventsModule
         services.AddIntegrationEventHandlers();
 
         services.AddEndpoints(Presentation.AssemblyReference.Assembly);
-        
+
         services.AddInfrastructure(configuration);
 
         return services;
+    }
+
+    public static Action<IRegistrationConfigurator> ConfigureConsumers(string cacheConnectionString)
+    {
+        // by default SAGAs in MassTransit are persisted in memory (or you can use SQL db, Redis, etc.)
+        return registrationConfigurator => registrationConfigurator
+            .AddSagaStateMachine<CancelEventSaga, CancelEventState>()
+            .RedisRepository(cacheConnectionString);
     }
 
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
