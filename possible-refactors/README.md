@@ -5,3 +5,4 @@ Ideas that were considered but not applied yet. Each entry explains the current 
 | Refactor | What it removes |
 | --- | --- |
 | [01 – Shared idempotent domain event handler](01-shared-idempotent-domain-event-handler.md) | The per-module copies of `IdempotentDomainEventHandler<T>` and of the `AddDomainEventHandlers` registration |
+| [02 – Outbox/inbox handler retries](02-outbox-inbox-handler-retries.md) | The permanent loss of a handler's work (and of every handler after it) when it throws during outbox/inbox processing |
