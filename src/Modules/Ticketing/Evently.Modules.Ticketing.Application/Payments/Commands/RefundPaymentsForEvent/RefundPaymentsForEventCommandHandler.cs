@@ -9,10 +9,7 @@ using Evently.Modules.Ticketing.Application.Events;
 
 namespace Evently.Modules.Ticketing.Application.Payments.Commands.RefundPaymentsForEvent;
 
-internal sealed class RefundPaymentsForEventCommandHandler(
-    IEventRepository eventRepository,
-    IPaymentRepository paymentRepository,
-    IUnitOfWork unitOfWork)
+internal sealed class RefundPaymentsForEventCommandHandler(IEventRepository eventRepository, IPaymentRepository paymentRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<RefundPaymentsForEventCommand>
 {
     public async Task<Result> Handle(RefundPaymentsForEventCommand request, CancellationToken cancellationToken)

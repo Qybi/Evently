@@ -45,6 +45,7 @@ string databaseConnectionString = builder.Configuration.GetConnectionString("Dat
 string cacheConnectionString = builder.Configuration.GetConnectionString("Cache")!;
 
 builder.Services.AddInfrastructure([
+    EventsModule.ConfigureConsumers(cacheConnectionString),
     TicketingModule.ConfigureConsumers,
     AttendanceModule.ConfigureConsumers
 ], cacheConnectionString);
