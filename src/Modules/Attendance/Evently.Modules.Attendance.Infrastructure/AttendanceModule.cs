@@ -2,6 +2,7 @@ using Evently.Modules.Attendance.Application.Abstractions.Authentication;
 using Evently.Modules.Attendance.Application.Abstractions.Data;
 using Evently.Modules.Attendance.Application.Attendees;
 using Evently.Modules.Attendance.Application.Events;
+using Evently.Modules.Attendance.Application.EventStatistics;
 using Evently.Modules.Attendance.Application.Tickets;
 using Evently.Modules.Attendance.Infrastructure.Authentication;
 using Evently.Modules.Attendance.Infrastructure.Database;
@@ -69,6 +70,7 @@ public static class AttendanceModule
         services.AddScoped<ITicketRepository, TicketRepository>();
 
         services.AddScoped<IAttendeeQueries, AttendeeQueries>();
+        services.AddScoped<IEventStatisticsQueries, EventStatisticsQueries>();
         services.AddScoped<ITicketQueries, TicketQueries>();
 
         services.AddScoped<IAttendanceContext, AttendanceContext>();
