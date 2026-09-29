@@ -16,4 +16,18 @@ internal sealed class EventStatisticsQueries(AttendanceDbContext context) : IEve
             .ProjectToViewModel()
             .SingleOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<int> CountTicketsSoldAsync(Guid eventId, CancellationToken cancellationToken = default)
+    {
+        return await context.Tickets
+            .Where(t => t.EventId == eventId)
+            .CountAsync(cancellationToken);
+    }
+
+    public async Task<int> CountAttendeesCheckedInAsync(Guid eventId, CancellationToken cancellationToken = default)
+    {
+        return await context.Tickets
+            .Where(t => t.EventId == eventId && t.UsedAtUtc != null)
+            .CountAsync(cancellationToken);
+    }
 }
