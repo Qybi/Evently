@@ -8,6 +8,7 @@ Evently has four modules: **Events**, **Users**, **Ticketing**, and **Attendance
 | [02 – Integration events and inbox](02-integration-events-and-inbox.md) | Publish, receive, persist, dispatch; cross-module sequence and component diagrams |
 | [03 – Operations and failure modes](03-operations-and-failure-modes.md) | Table layout, jobs, transaction boundaries, idempotency, failure behavior |
 | [04 – Database reads, writes, and retries](04-database-reads-writes-and-retries.md) | Exact order of SQL reads/writes, scopes, commits, and outcomes at each failure point |
+| [05 – Cancel event saga](05-cancel-event-saga.md) | MassTransit state machine that coordinates event cancellation between Events and Ticketing; state diagram, transitions, completion bitmask |
 
 ## System map
 

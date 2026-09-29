@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
 using Evently.Modules.Users.Application.Users.Commands.UpdateUser;
+using Evently.Modules.Users.Application.Users.Queries.GetUser;
+using Evently.Modules.Users.Application.Users.Queries.ViewModels;
 using Evently.Shared.Domain;
 using Evently.Shared.Infrastructure.Authentication;
 using Evently.Shared.Presentation.ApiResults;
@@ -15,14 +17,11 @@ internal sealed class GetUserProfile : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("users/profile", async (Request request, ClaimsPrincipal claims, ISender sender) =>
+        app.MapGet("users/{id}/profile", async (ClaimsPrincipal claims, ISender sender) =>
         {
-            Result result = await sender.Send(new UpdateUserCommand(
-                claims.GetUserId(),
-                request.FirstName,
-                request.LastName));
+            Result<UserViewModel> result = await sender.Send(new GetUserQuery(claims.GetUserId()));
 
-            return result.Match(Results.NoContent, ApiResults.Problem);
+            return result.Match(Results.Ok, ApiResults.Problem);
         })
         .RequireAuthorization(Permissions.GetUser)
         .WithTags(Tags.Users);
