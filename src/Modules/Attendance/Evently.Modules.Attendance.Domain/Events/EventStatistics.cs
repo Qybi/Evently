@@ -1,7 +1,13 @@
 ﻿namespace Evently.Modules.Attendance.Domain.Events;
 
+// this class represents a materialized view on data present in the current module. It gets data from the handlers inside Application/EventStatistics/Projections that update and insert
+// data on this class correspondant table
 public sealed class EventStatistics
 {
+    private EventStatistics()
+    {
+    }
+
     public Guid EventId { get; private set; }
 
     public string Title { get; private set; }
@@ -37,9 +43,33 @@ public sealed class EventStatistics
             Description = description,
             Location = location,
             StartsAtUtc = startsAtUtc,
-            EndsAtUtc = endsAtUtc
+            EndsAtUtc = endsAtUtc,
+            TicketsSold = 0,
+            AttendeesCheckedIn = 0,
+            DuplicateCheckInTickets = [],
+            InvalidCheckInTickets = []
         };
 
         return @event;
+    }
+
+    public void UpdateTicketsSold(int ticketsSold)
+    {
+        TicketsSold = ticketsSold;
+    }
+
+    public void UpdateAttendeesCheckedIn(int attendeesCheckedIn)
+    {
+        AttendeesCheckedIn = attendeesCheckedIn;
+    }
+
+    public void AddDuplicateCheckInTicket(string ticketCode)
+    {
+        DuplicateCheckInTickets.Add(ticketCode);
+    }
+
+    public void AddInvalidCheckInTicket(string ticketCode)
+    {
+        InvalidCheckInTickets.Add(ticketCode);
     }
 }
