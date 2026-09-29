@@ -9,8 +9,4 @@
     <ProjectReference Include="..\Evently.Modules.Attendance.Domain\Evently.Modules.Attendance.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="EventStatistics\Projections\" />
-  </ItemGroup>
-
 </Project>
