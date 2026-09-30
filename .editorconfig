@@ -392,3 +392,8 @@ dotnet_diagnostic.S4136.severity = none
 dotnet_diagnostic.S6605.severity = none
 
 dotnet_diagnostic.S6966.severity = none
+
+# ============= TESTS - CLASSES ONLY =============
+# CA1515: A type inside an executable assembly is declared as public, consider making it internal
+[test/**/*.cs]
+dotnet_diagnostic.CA1515.severity = none
