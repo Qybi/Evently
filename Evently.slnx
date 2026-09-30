@@ -51,6 +51,7 @@
   <Folder Name="/test/Modules/" />
   <Folder Name="/test/Modules/Attendance/">
     <Project Path="test/Modules/Attendance/Evently.Tests.Modules.Attendance.ArchitectureTests/Evently.Tests.Modules.Attendance.ArchitectureTests.csproj" />
+    <Project Path="test/Modules/Attendance/Evently.Tests.Modules.Attendance.UnitTests/Evently.Tests.Modules.Attendance.UnitTests.csproj" />
   </Folder>
   <Folder Name="/test/Modules/Events/">
     <Project Path="test/Modules/Events/Evently.Tests.Modules.Events.ArchitectureTests/Evently.Tests.Modules.Events.ArchitectureTests.csproj" />
