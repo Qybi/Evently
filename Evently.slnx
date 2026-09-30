@@ -54,6 +54,7 @@
   </Folder>
   <Folder Name="/test/Modules/Events/">
     <Project Path="test/Modules/Events/Evently.Tests.Modules.Events.ArchitectureTests/Evently.Tests.Modules.Events.ArchitectureTests.csproj" />
+    <Project Path="test/Modules/Events/Evently.Tests.Modules.Events.UnitTests/Evently.Tests.Modules.Events.UnitTests.csproj" Id="24c5a542-e68e-4d4b-95e8-c5b442aacb91" />
   </Folder>
   <Folder Name="/test/Modules/Ticketing/">
     <Project Path="test/Modules/Ticketing/Evently.Tests.Modules.Ticketing.ArchitectureTests/Evently.Tests.Modules.Ticketing.ArchitectureTests.csproj" />
