@@ -59,6 +59,7 @@
   </Folder>
   <Folder Name="/test/Modules/Ticketing/">
     <Project Path="test/Modules/Ticketing/Evently.Tests.Modules.Ticketing.ArchitectureTests/Evently.Tests.Modules.Ticketing.ArchitectureTests.csproj" />
+    <Project Path="test/Modules/Ticketing/Evently.Tests.Modules.Ticketing.UnitTests/Evently.Tests.Modules.Ticketing.UnitTests.csproj" />
   </Folder>
   <Folder Name="/test/Modules/Users/">
     <Project Path="test/Modules/Users/Evently.Tests.Modules.Users.ArchitectureTests/Evently.Tests.Modules.Users.ArchitectureTests.csproj" />
