@@ -61,6 +61,7 @@
   </Folder>
   <Folder Name="/test/Modules/Users/">
     <Project Path="test/Modules/Users/Evently.Tests.Modules.Users.ArchitectureTests/Evently.Tests.Modules.Users.ArchitectureTests.csproj" />
+    <Project Path="test/Modules/Users/Evently.Tests.Modules.Users.UnitTests/Evently.Tests.Modules.Users.UnitTests.csproj" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
