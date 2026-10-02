@@ -31,8 +31,11 @@ public static class InfrastructureConfiguration
         services.AddQuartz(configurator =>
         {
             var scheduler = Guid.NewGuid();
-            configurator.SchedulerId = $"default-id-{scheduler}";
-            configurator.SchedulerName = $"default-name-{scheduler}";
+            configurator.ConfigureScheduler(options =>
+            {
+                options.InstanceId = $"default-id-{scheduler}";
+                options.InstanceName = $"default-name-{scheduler}";
+            });
         });
 
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
