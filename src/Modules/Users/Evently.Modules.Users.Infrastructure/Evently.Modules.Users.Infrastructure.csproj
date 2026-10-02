@@ -1,10 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <Folder Include="Database\Migrations\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Evently.Shared.Infrastructure\Evently.Shared.Infrastructure.csproj" />
-    <ProjectReference Include="..\Evently.Modules.Users.Application\Evently.Modules.Users.Application.csproj" />
-    <ProjectReference Include="..\Evently.Modules.Users.Presentation\Evently.Modules.Users.Presentation.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Database\Migrations\" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Shared\Evently.Shared.Infrastructure\Evently.Shared.Infrastructure.csproj" />
+		<ProjectReference Include="..\Evently.Modules.Users.Application\Evently.Modules.Users.Application.csproj" />
+		<ProjectReference Include="..\Evently.Modules.Users.Presentation\Evently.Modules.Users.Presentation.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Evently.Tests.Modules.Users.IntegrationTests" />
+		<InternalsVisibleTo Include="Evently.IntegrationTests" />
+	</ItemGroup>
 </Project>
