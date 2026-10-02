@@ -10,6 +10,6 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Evently.Tests.Modules.Users.IntegrationTests" />
-		<InternalsVisibleTo Include="Evently.IntegrationTests" />
+		<InternalsVisibleTo Include="Evently.Tests.IntegrationTests" />
 	</ItemGroup>
 </Project>
