@@ -6,7 +6,7 @@ using Evently.Shared.Application.Authorization;
 using Evently.Shared.Domain;
 using Evently.Tests.Modules.Users.IntegrationTests.Abstraction;
 
-namespace Evently.Tests.Modules.Users.IntegrationTests.RegisterUser;
+namespace Evently.Tests.Modules.Users.IntegrationTests.Users;
 
 public class GetUserPermissionTests : BaseIntegrationTest
 {

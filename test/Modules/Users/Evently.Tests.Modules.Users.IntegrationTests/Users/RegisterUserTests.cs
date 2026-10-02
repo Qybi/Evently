@@ -1,10 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using AwesomeAssertions;
-using Evently.Modules.Users.Presentation.Users;
 using Evently.Tests.Modules.Users.IntegrationTests.Abstraction;
 
-namespace Evently.Modules.Users.IntegrationTests.Users;
+namespace Evently.Tests.Modules.Users.IntegrationTests.Users;
 
 public class RegisterUserTests : BaseIntegrationTest
 {
@@ -32,7 +31,7 @@ public class RegisterUserTests : BaseIntegrationTest
         string lastName)
     {
         // Arrange
-        var request = new RegisterUser.Request
+        var request = new Evently.Modules.Users.Presentation.Users.RegisterUser.Request
         {
             Email = email,
             Password = password,
@@ -51,7 +50,7 @@ public class RegisterUserTests : BaseIntegrationTest
     public async Task Should_ReturnOk_WhenRequestIsValid()
     {
         // Arrange
-        var request = new RegisterUser.Request
+        var request = new Evently.Modules.Users.Presentation.Users.RegisterUser.Request
         {
             Email = "create@test.com",
             Password = Faker.Internet.Password(),
@@ -70,7 +69,7 @@ public class RegisterUserTests : BaseIntegrationTest
     public async Task Should_ReturnAccessToken_WhenUserIsRegistered()
     {
         // Arrange
-        var request = new RegisterUser.Request
+        var request = new Evently.Modules.Users.Presentation.Users.RegisterUser.Request
         {
             Email = "token@test.com",
             Password = Faker.Internet.Password(),

@@ -6,7 +6,7 @@ using Evently.Shared.Domain;
 using Evently.Shared.Domain.Errors;
 using Evently.Tests.Modules.Users.IntegrationTests.Abstraction;
 
-namespace Evently.Modules.Users.IntegrationTests.Users;
+namespace Evently.Tests.Modules.Users.IntegrationTests.Users;
 
 public class UpdateUserTests : BaseIntegrationTest
 {

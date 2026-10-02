@@ -1,15 +1,13 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Evently.Modules.Users.Application.Users.GetUser;
-using Evently.Modules.Users.IntegrationTests.Abstractions;
+using AwesomeAssertions;
+using Evently.Modules.Users.Application.Users.Queries.ViewModels;
 using Evently.Modules.Users.Presentation.Users;
 using Evently.Tests.Modules.Users.IntegrationTests.Abstraction;
-using AwesomeAssertions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Evently.Modules.Users.Application.Users.Queries.ViewModels;
 
-namespace Evently.Modules.Users.IntegrationTests.Users;
+namespace Evently.Tests.Modules.Users.IntegrationTests.Users;
 
 public class GetUserProfileTests : BaseIntegrationTest
 {
