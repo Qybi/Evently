@@ -23,7 +23,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     private readonly RedisContainer _redisContainer = new RedisBuilder("redis:8")
         .Build();
 
-    private readonly KeycloakContainer _keycloakContainer = new KeycloakBuilder("quay.io/keycloak/keycloak:26")
+    private readonly KeycloakContainer _keycloakContainer = new KeycloakBuilder("quay.io/keycloak/keycloak:26.7")
         .WithResourceMapping(
             new FileInfo("realm-export.json"),
             new FileInfo("/opt/keycloak/data/import/realm.json"))
