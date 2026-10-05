@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.Keycloak;
 using Testcontainers.PostgreSql;
+using Testcontainers.RabbitMq;
 using Testcontainers.Redis;
 
 namespace Evently.Tests.Modules.Users.IntegrationTests.Abstraction;
@@ -23,6 +24,11 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     private readonly RedisContainer _redisContainer = new RedisBuilder("redis:8")
         .Build();
 
+    private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder("rabbitmq:4-management-alpine")
+        .WithUsername("guest")
+        .WithPassword("guest")
+        .Build();
+
     private readonly KeycloakContainer _keycloakContainer = new KeycloakBuilder("quay.io/keycloak/keycloak:26.7")
         .WithResourceMapping(
             new FileInfo("realm-export.json"),
@@ -34,6 +40,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     {
         Environment.SetEnvironmentVariable("ConnectionStrings:Database", _dbContainer.GetConnectionString());
         Environment.SetEnvironmentVariable("ConnectionStrings:Cache", _redisContainer.GetConnectionString());
+        Environment.SetEnvironmentVariable("ConnectionStrings:Queue", _rabbitMqContainer.GetConnectionString());
 
         string keyCloakAddress = _keycloakContainer.GetBaseAddress();
         string keyCloakRealmUrl = $"{keyCloakAddress}realms/Evently";
@@ -55,6 +62,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     {
         await _dbContainer.StartAsync();
         await _redisContainer.StartAsync();
+        await _rabbitMqContainer.StartAsync();
         await _keycloakContainer.StartAsync();
     }
 
@@ -62,6 +70,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     {
         await _dbContainer.StopAsync();
         await _redisContainer.StopAsync();
+        await _rabbitMqContainer.StopAsync();
         await _keycloakContainer.StopAsync();
     }
 }
