@@ -11,6 +11,8 @@ services:
     depends_on:
       evently.database:
         condition: service_healthy
+      evently.queue:
+        condition: service_healthy
 
   evently.database:
     image: postgres:18
@@ -67,3 +69,22 @@ services:
       - 14317:4317
       - 14318:4318
       - 16686:16686
+
+  evently.queue:
+    image: rabbitmq:4-management-alpine
+    container_name: Evently.Queue
+    hostname: evently-queue
+    volumes:
+        - ./.containers/queue/data/:/var/lib/rabbitmq
+        - ./.containers/queue/log/:/var/log/rabbitmq
+    environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - 5673:5672
+      - 15673:15672
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
