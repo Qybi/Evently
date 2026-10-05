@@ -10,6 +10,7 @@
   <Folder Name="/src/" />
   <Folder Name="/src/API/">
     <Project Path="src/API/Evently.Api/Evently.Api.csproj" />
+    <Project Path="src/API/Evently.Gateway/Evently.Gateway.csproj" Id="d74c87ca-ca92-479c-b02d-c8f8800973d7" />
   </Folder>
   <Folder Name="/src/Modules/" />
   <Folder Name="/src/Modules/Attendance/">
