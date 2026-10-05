@@ -37,11 +37,12 @@ public static class EventsModule
         return services;
     }
 
-    public static Action<IRegistrationConfigurator> ConfigureConsumers(string cacheConnectionString)
+    public static Action<IRegistrationConfigurator, string> ConfigureConsumers(string cacheConnectionString)
     {
         // by default SAGAs in MassTransit are persisted in memory (or you can use SQL db, Redis, etc.)
-        return registrationConfigurator => registrationConfigurator
+        return (registrationConfigurator, instanceId) => registrationConfigurator
             .AddSagaStateMachine<CancelEventSaga, CancelEventState>()
+            .Endpoint(c => c.InstanceId = instanceId)
             .RedisRepository(cacheConnectionString);
     }
 

@@ -7,6 +7,8 @@ using Evently.Modules.Ticketing.Infrastructure;
 using Evently.Modules.Users.Infrastructure;
 using Evently.Shared.Application;
 using Evently.Shared.Infrastructure;
+using Evently.Shared.Infrastructure.Configuration;
+using Evently.Shared.Infrastructure.EventBus;
 using Evently.Shared.Presentation.Endpoints;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -42,8 +44,8 @@ builder.Services.AddApplication([
     Evently.Modules.Attendance.Application.AssemblyReference.Assembly
 ]);
 
-string databaseConnectionString = builder.Configuration.GetConnectionString("Database")!;
-string cacheConnectionString = builder.Configuration.GetConnectionString("Cache")!;
+string cacheConnectionString = builder.Configuration.GetConnectionStringOrThrow("Cache");
+RabbitMqSettings rabbitMqSettings = new(builder.Configuration.GetConnectionStringOrThrow("Queue"));
 
 builder.Services.AddInfrastructure(
     DiagnosticsConfig.ServiceName,
@@ -51,14 +53,13 @@ builder.Services.AddInfrastructure(
         EventsModule.ConfigureConsumers(cacheConnectionString),
         TicketingModule.ConfigureConsumers,
         AttendanceModule.ConfigureConsumers
-    ], cacheConnectionString);
+    ],
+    rabbitMqSettings,
+    cacheConnectionString);
 
 builder.Configuration.AddModuleConfiguration(["events", "users", "ticketing", "attendance"]);
 
-builder.Services.AddHealthChecks()
-    .AddNpgSql(databaseConnectionString)
-    .AddRedis(cacheConnectionString)
-    .AddUrlGroup(new Uri(builder.Configuration.GetValue<string>("KeyCloak:HealthUrl")!), HttpMethod.Get, "keycloak");
+builder.Services.AddHealthChecksInternal(builder.Configuration);
 
 builder.Services.AddEventsModule(builder.Configuration);
 builder.Services.AddUsersModule(builder.Configuration);

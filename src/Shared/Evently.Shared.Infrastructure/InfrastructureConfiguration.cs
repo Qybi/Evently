@@ -5,6 +5,7 @@ using Evently.Shared.Infrastructure.Authentication;
 using Evently.Shared.Infrastructure.Authorization;
 using Evently.Shared.Infrastructure.Caching;
 using Evently.Shared.Infrastructure.Clock;
+using Evently.Shared.Infrastructure.EventBus;
 using Evently.Shared.Infrastructure.Outbox;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,11 @@ namespace Evently.Shared.Infrastructure;
 
 public static class InfrastructureConfiguration
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string serviceName, Action<IRegistrationConfigurator>[] moduleConfigureConsumers, string redisConnectionString)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, 
+        string serviceName, 
+        Action<IRegistrationConfigurator, string>[] moduleConfigureConsumers, 
+        RabbitMqSettings rabbitMqSettings,
+        string redisConnectionString)
     {
         services.AddAuthenticationInternal();
 
@@ -64,16 +69,22 @@ public static class InfrastructureConfiguration
 
         services.AddMassTransit((configure) =>
         {
-            foreach (Action<IRegistrationConfigurator> configureConsumer in moduleConfigureConsumers)
+            string instanceId = serviceName.ToLowerInvariant().Replace(".", "-"); // Evently.Api -> evently-api
+            foreach (Action<IRegistrationConfigurator, string> configureConsumer in moduleConfigureConsumers)
             {
-                configureConsumer(configure);
+                configureConsumer(configure, instanceId);
             }
 
             // Include the namespace so same-named consumers in different modules get separate endpoints
             configure.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
 
-            configure.UsingInMemory((context, cfg) =>
+            configure.UsingRabbitMq((context, cfg) =>
             {
+                cfg.Host(new Uri(rabbitMqSettings.Host), h =>
+                {
+                    h.Username(rabbitMqSettings.Username);
+                    h.Password(rabbitMqSettings.Password);
+                });
                 cfg.ConfigureEndpoints(context);
             });
         });
