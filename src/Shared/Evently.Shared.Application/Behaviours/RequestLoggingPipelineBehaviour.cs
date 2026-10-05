@@ -1,4 +1,5 @@
-﻿using Evently.Shared.Domain;
+﻿using System.Diagnostics;
+using Evently.Shared.Domain;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
@@ -18,6 +19,10 @@ internal sealed class RequestLoggingPipelineBehaviour<TRequest, TResponse>(
     {
         string moduleName = GetModuleName(typeof(TRequest).FullName!);
         string requestName = typeof(TRequest).Name;
+
+        // tags for open telemetry, to be able to filter requests by module and request name on jaeger or other open telemetry tools
+        Activity.Current?.SetTag("request.module", moduleName);
+        Activity.Current?.SetTag("request.name", requestName);
 
         using (LogContext.PushProperty("Module", moduleName))
         {

@@ -1,5 +1,6 @@
 using Evently.Api.Extensions;
 using Evently.Api.Middleware;
+using Evently.Api.OpenTelemetry;
 using Evently.Modules.Attendance.Infrastructure;
 using Evently.Modules.Events.Infrastructure;
 using Evently.Modules.Ticketing.Infrastructure;
@@ -44,11 +45,13 @@ builder.Services.AddApplication([
 string databaseConnectionString = builder.Configuration.GetConnectionString("Database")!;
 string cacheConnectionString = builder.Configuration.GetConnectionString("Cache")!;
 
-builder.Services.AddInfrastructure([
-    EventsModule.ConfigureConsumers(cacheConnectionString),
-    TicketingModule.ConfigureConsumers,
-    AttendanceModule.ConfigureConsumers
-], cacheConnectionString);
+builder.Services.AddInfrastructure(
+    DiagnosticsConfig.ServiceName,
+    [
+        EventsModule.ConfigureConsumers(cacheConnectionString),
+        TicketingModule.ConfigureConsumers,
+        AttendanceModule.ConfigureConsumers
+    ], cacheConnectionString);
 
 builder.Configuration.AddModuleConfiguration(["events", "users", "ticketing", "attendance"]);
 
@@ -76,6 +79,8 @@ app.MapHealthChecks("health", new HealthCheckOptions()
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
+
+app.UseLogContextTraceLogging();
 
 app.UseSerilogRequestLogging();
 
