@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using Evently.Shared.Application.Messaging;
+﻿using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using Evently.Modules.Ticketing.Application.Abstractions.Data;
 using Evently.Modules.Ticketing.Domain.Events;
@@ -14,7 +13,7 @@ internal sealed class RefundPaymentsForEventCommandHandler(IEventRepository even
 {
     public async Task<Result> Handle(RefundPaymentsForEventCommand request, CancellationToken cancellationToken)
     {
-        await using DbTransaction transaction = await unitOfWork.BeginTransactionAsync(cancellationToken);
+        await using ITransaction transaction =await unitOfWork.BeginTransactionAsync(cancellationToken);
 
         Event? @event = await eventRepository.GetAsync(request.EventId, cancellationToken);
 

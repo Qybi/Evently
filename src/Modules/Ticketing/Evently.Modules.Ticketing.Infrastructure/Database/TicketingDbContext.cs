@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using Evently.Modules.Ticketing.Application.Abstractions.Data;
+﻿using Evently.Modules.Ticketing.Application.Abstractions.Data;
 using Evently.Modules.Ticketing.Domain.Customers;
 using Evently.Modules.Ticketing.Domain.Events;
 using Evently.Modules.Ticketing.Domain.Orders;
@@ -10,7 +9,6 @@ using Evently.Modules.Ticketing.Infrastructure.Database.Configurations;
 using Evently.Shared.Infrastructure.Inbox;
 using Evently.Shared.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Evently.Modules.Ticketing.Infrastructure.Database;
 
@@ -44,13 +42,8 @@ public sealed class TicketingDbContext(DbContextOptions<TicketingDbContext> opti
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
     }
 
-    public async Task<DbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task<ITransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
-        if (Database.CurrentTransaction is not null)
-        {
-            await Database.CurrentTransaction.DisposeAsync();
-        }
-
-        return (await Database.BeginTransactionAsync(cancellationToken)).GetDbTransaction();
+        return new EfTransaction(await Database.BeginTransactionAsync(cancellationToken));
     }
 }

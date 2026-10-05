@@ -26,7 +26,18 @@ public static class InfrastructureConfiguration
 
         services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        services.AddQuartz();
+        // setting an Id for each instance, is useful for parallel testing when multiple quartz instances can spin up at the same time. The ids helps with recognizing each instance with
+        // their jobs
+        services.AddQuartz(configurator =>
+        {
+            var scheduler = Guid.NewGuid();
+            configurator.ConfigureScheduler(options =>
+            {
+                options.InstanceId = $"default-id-{scheduler}";
+                options.InstanceName = $"default-name-{scheduler}";
+            });
+        });
+
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         try

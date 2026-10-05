@@ -166,7 +166,7 @@ public partial class AddTicketingSchema : Migration
                 order_id = table.Column<Guid>(type: "uuid", nullable: false),
                 event_id = table.Column<Guid>(type: "uuid", nullable: false),
                 ticket_type_id = table.Column<Guid>(type: "uuid", nullable: false),
-                code = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                 created_at_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                 archived = table.Column<bool>(type: "boolean", nullable: false)
             },

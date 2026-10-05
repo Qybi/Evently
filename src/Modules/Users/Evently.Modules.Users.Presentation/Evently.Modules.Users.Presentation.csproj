@@ -4,4 +4,8 @@
     <ProjectReference Include="..\..\..\Shared\Evently.Shared.Presentation\Evently.Shared.Presentation.csproj" />
     <ProjectReference Include="..\Evently.Modules.Users.Application\Evently.Modules.Users.Application.csproj" />
   </ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Evently.Tests.Modules.Users.IntegrationTests" />
+	</ItemGroup>
 </Project>

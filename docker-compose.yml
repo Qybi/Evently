@@ -39,14 +39,14 @@ services:
       - 8082:80
   
   evently.redis:
-    image: redis:latest
+    image: redis:8
     container_name: Evently.Redis
     restart: always
     ports:
       - 6379:6379
 
   evently.identity:
-    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:26.7
     container_name: Evently.Identity
     command: start-dev
     environment:
