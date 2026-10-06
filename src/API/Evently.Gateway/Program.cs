@@ -46,4 +46,4 @@ app.UseAuthorization();
 
 app.MapReverseProxy();
 
-app.Run();
+await app.RunAsync();
