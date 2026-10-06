@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
-namespace Evently.Modules.Users.Presentation.Users;
+namespace Evently.Modules.Users.Presentation.Users.Endpoints;
 
 internal sealed class UpdateUserProfile : IEndpoint
 {

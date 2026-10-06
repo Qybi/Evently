@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using AwesomeAssertions;
 using Evently.Modules.Users.Application.Users.Queries.ViewModels;
-using Evently.Modules.Users.Presentation.Users;
+using Evently.Modules.Users.Presentation.Users.Endpoints;
 using Evently.Tests.Modules.Users.IntegrationTests.Abstraction;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
