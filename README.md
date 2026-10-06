@@ -15,5 +15,5 @@ My current version runs on the following stack and differences:
 cd into src\API\Evently.Api
 
 ```powershell
-dotnet ef migrations add MIGRATION_NAME -c DB_CONTEXT -o Database\Migrations -p ..\..\Modules\Events\Evently.Modules.Events.Infrastructure\Evently.Modules.Events.Infrastructure.csproj
+dotnet ef migrations add MIGRATION_NAME -c DB_CONTEXT -o Database\Migrations -p ..\..\Modules\<module>\Evently.Modules.<module>.Infrastructure\Evently.Modules.<module>.Infrastructure.csproj
 ```
