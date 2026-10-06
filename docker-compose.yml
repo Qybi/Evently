@@ -13,7 +13,23 @@ services:
         condition: service_healthy
       evently.queue:
         condition: service_healthy
-  
+
+  evently.ticketing.api:
+    image: ${DOCKER_REGISTRY-}eventlyticketingapi
+    build:
+      context: .
+      dockerfile: src/API/Evently.Ticketing.Api/Dockerfile
+    ports:
+      - "8080"
+      - "8081"
+    depends_on:
+      evently.database:
+        condition: service_healthy
+      evently.queue:
+        condition: service_healthy
+      evently.api:
+        condition: service_started
+
   evently.gateway:
     image: ${DOCKER_REGISTRY-}eventlygateway
     build:
