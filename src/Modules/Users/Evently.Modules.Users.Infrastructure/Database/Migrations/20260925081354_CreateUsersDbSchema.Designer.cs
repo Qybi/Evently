@@ -65,7 +65,7 @@ namespace Evently.Modules.Users.Infrastructure.Database.Migrations
                         },
                         new
                         {
-                            Code = "ticket-types:udpate"
+                            Code = "ticket-types:update"
                         },
                         new
                         {
@@ -318,7 +318,7 @@ namespace Evently.Modules.Users.Infrastructure.Database.Migrations
                         },
                         new
                         {
-                            PermissionCode = "ticket-types:udpate",
+                            PermissionCode = "ticket-types:update",
                             RoleName = "Administrator"
                         },
                         new
