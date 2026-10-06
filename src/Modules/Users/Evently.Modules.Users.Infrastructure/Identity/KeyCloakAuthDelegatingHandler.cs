@@ -54,6 +54,8 @@ internal sealed class KeyCloakAuthDelegatingHandler(IOptions<KeyCloakOptions> op
 
         using HttpResponseMessage authorizationResponse = await base.SendAsync(authRequest, cancellationToken);
 
+        authorizationResponse.EnsureSuccessStatusCode();
+
         return await authorizationResponse.Content.ReadFromJsonAsync<AuthToken>(cancellationToken);
     }
 

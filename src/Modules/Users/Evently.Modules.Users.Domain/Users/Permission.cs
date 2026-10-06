@@ -8,7 +8,7 @@ public sealed class Permission
     public static readonly Permission SearchEvents = new("events:search");
     public static readonly Permission ModifyEvents = new("events:update");
     public static readonly Permission GetTicketTypes = new("ticket-types:read");
-    public static readonly Permission ModifyTicketTypes = new("ticket-types:udpate");
+    public static readonly Permission ModifyTicketTypes = new("ticket-types:update");
     public static readonly Permission GetCategories = new("categories:read");
     public static readonly Permission ModifyCategories = new("categories:update");
     public static readonly Permission GetCart = new("carts:read");

@@ -1,11 +1,13 @@
 using Evently.Api.Extensions;
 using Evently.Api.Middleware;
+using Evently.Api.OpenTelemetry;
 using Evently.Modules.Attendance.Infrastructure;
 using Evently.Modules.Events.Infrastructure;
-using Evently.Modules.Ticketing.Infrastructure;
 using Evently.Modules.Users.Infrastructure;
 using Evently.Shared.Application;
 using Evently.Shared.Infrastructure;
+using Evently.Shared.Infrastructure.Configuration;
+using Evently.Shared.Infrastructure.EventBus;
 using Evently.Shared.Presentation.Endpoints;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -37,29 +39,28 @@ builder.Services.AddOpenApi(options =>
 builder.Services.AddApplication([
     Evently.Modules.Events.Application.AssemblyReference.Assembly,
     Evently.Modules.Users.Application.AssemblyReference.Assembly,
-    Evently.Modules.Ticketing.Application.AssemblyReference.Assembly,
     Evently.Modules.Attendance.Application.AssemblyReference.Assembly
 ]);
 
-string databaseConnectionString = builder.Configuration.GetConnectionString("Database")!;
-string cacheConnectionString = builder.Configuration.GetConnectionString("Cache")!;
+string cacheConnectionString = builder.Configuration.GetConnectionStringOrThrow("Cache");
+RabbitMqSettings rabbitMqSettings = new(builder.Configuration.GetConnectionStringOrThrow("Queue"));
 
-builder.Services.AddInfrastructure([
-    EventsModule.ConfigureConsumers(cacheConnectionString),
-    TicketingModule.ConfigureConsumers,
-    AttendanceModule.ConfigureConsumers
-], cacheConnectionString);
+builder.Services.AddInfrastructure(
+    DiagnosticsConfig.ServiceName,
+    [
+        EventsModule.ConfigureConsumers(cacheConnectionString),
+        AttendanceModule.ConfigureConsumers,
+        UsersModule.ConfigureConsumers
+    ],
+    rabbitMqSettings,
+    cacheConnectionString);
 
-builder.Configuration.AddModuleConfiguration(["events", "users", "ticketing", "attendance"]);
+builder.Configuration.AddModuleConfiguration(["events", "users", "attendance"]);
 
-builder.Services.AddHealthChecks()
-    .AddNpgSql(databaseConnectionString)
-    .AddRedis(cacheConnectionString)
-    .AddUrlGroup(new Uri(builder.Configuration.GetValue<string>("KeyCloak:HealthUrl")!), HttpMethod.Get, "keycloak");
+builder.Services.AddHealthChecksInternal(builder.Configuration);
 
 builder.Services.AddEventsModule(builder.Configuration);
 builder.Services.AddUsersModule(builder.Configuration);
-builder.Services.AddTicketingModule(builder.Configuration);
 builder.Services.AddAttendanceModule(builder.Configuration);
 
 WebApplication app = builder.Build();
@@ -77,6 +78,8 @@ app.MapHealthChecks("health", new HealthCheckOptions()
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
+app.UseLogContextTraceLogging();
+
 app.UseSerilogRequestLogging();
 
 app.UseExceptionHandler();
@@ -85,4 +88,4 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.Run();
+await app.RunAsync();

@@ -5,7 +5,7 @@ using Evently.Shared.Infrastructure.Serialization;
 using MassTransit;
 using Newtonsoft.Json;
 
-namespace Evently.Modules.Attendance.Infrastructure.Inbox;
+namespace Evently.Modules.Events.Infrastructure.Inbox;
 
 internal sealed class IntegrationEventConsumer<TIntegrationEvent>(EventsDbContext eventsDbContext)
     : IConsumer<TIntegrationEvent>

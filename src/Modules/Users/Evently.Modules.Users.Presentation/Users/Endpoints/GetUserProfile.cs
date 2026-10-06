@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Evently.Modules.Users.Application.Users.Commands.UpdateUser;
 using Evently.Modules.Users.Application.Users.Queries.GetUser;
 using Evently.Modules.Users.Application.Users.Queries.ViewModels;
 using Evently.Shared.Domain;
@@ -11,13 +10,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
-namespace Evently.Modules.Users.Presentation.Users;
+namespace Evently.Modules.Users.Presentation.Users.Endpoints;
 
 internal sealed class GetUserProfile : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("users/{id}/profile", async (ClaimsPrincipal claims, ISender sender) =>
+        app.MapGet("users/profile", async (ClaimsPrincipal claims, ISender sender) =>
         {
             Result<UserViewModel> result = await sender.Send(new GetUserQuery(claims.GetUserId()));
 

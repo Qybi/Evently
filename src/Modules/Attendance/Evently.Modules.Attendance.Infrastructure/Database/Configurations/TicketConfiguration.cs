@@ -12,7 +12,7 @@ internal sealed class TicketConfiguration : IEntityTypeConfiguration<Ticket>
     {
         builder.HasKey(t => t.Id);
 
-        builder.Property(t => t.Code).HasMaxLength(30);
+        builder.Property(t => t.Code).HasMaxLength(50);
 
         builder.HasIndex(t => t.Code).IsUnique();
 

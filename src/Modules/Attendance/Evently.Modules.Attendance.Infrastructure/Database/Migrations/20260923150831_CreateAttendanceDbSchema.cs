@@ -54,7 +54,7 @@ public partial class CreateAttendanceDbSchema : Migration
                 id = table.Column<Guid>(type: "uuid", nullable: false),
                 attendee_id = table.Column<Guid>(type: "uuid", nullable: false),
                 event_id = table.Column<Guid>(type: "uuid", nullable: false),
-                code = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                 used_at_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
             },
             constraints: table =>

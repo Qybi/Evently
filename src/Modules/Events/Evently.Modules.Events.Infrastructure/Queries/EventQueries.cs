@@ -66,7 +66,10 @@ internal sealed class EventQueries(EventsDbContext context) : IEventQueries
 
         if (endDate.HasValue)
         {
-            query = query.Where(e => e.EndsAtUtc <= endDate.Value.Date);
+            // End day is inclusive: keep events that end any time on endDate, not only at its midnight
+            DateTime endExclusive = endDate.Value.Date.AddDays(1);
+
+            query = query.Where(e => e.EndsAtUtc < endExclusive);
         }
 
         int totalCount = await query.CountAsync(cancellationToken);

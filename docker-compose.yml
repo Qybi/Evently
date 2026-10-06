@@ -11,6 +11,33 @@ services:
     depends_on:
       evently.database:
         condition: service_healthy
+      evently.queue:
+        condition: service_healthy
+
+  evently.ticketing.api:
+    image: ${DOCKER_REGISTRY-}eventlyticketingapi
+    build:
+      context: .
+      dockerfile: src/API/Evently.Ticketing.Api/Dockerfile
+    ports:
+      - "8080"
+      - "8081"
+    depends_on:
+      evently.database:
+        condition: service_healthy
+      evently.queue:
+        condition: service_healthy
+      evently.api:
+        condition: service_started
+
+  evently.gateway:
+    image: ${DOCKER_REGISTRY-}eventlygateway
+    build:
+      context: .
+      dockerfile: src/API/Evently.Gateway/Dockerfile
+    ports:
+      - 3000:8080
+      - 3001:8081
 
   evently.database:
     image: postgres:18
@@ -39,16 +66,16 @@ services:
       - 8082:80
   
   evently.redis:
-    image: redis:latest
+    image: redis:8
     container_name: Evently.Redis
     restart: always
     ports:
       - 6379:6379
 
   evently.identity:
-    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:26.7
     container_name: Evently.Identity
-    command: start-dev
+    command: start-dev --import-realm
     environment:
       - KC_HEALTH_ENABLED=true
       - KEYCLOAK_ADMIN=admin
@@ -59,3 +86,30 @@ services:
     ports:
       - 18080:8080
       #- 19000:9000 # if you want to expose health check locally
+  
+  evently.jaeger:
+    image: jaegertracing/all-in-one:1.76.0
+    container_name: Evently.Jaeger
+    ports:
+      - 14317:4317
+      - 14318:4318
+      - 16686:16686
+
+  evently.queue:
+    image: rabbitmq:4-management-alpine
+    container_name: Evently.Queue
+    hostname: evently-queue
+    volumes:
+        - ./.containers/queue/data/:/var/lib/rabbitmq
+        - ./.containers/queue/log/:/var/log/rabbitmq
+    environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - 5673:5672
+      - 15673:15672
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

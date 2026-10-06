@@ -41,6 +41,11 @@ internal sealed class AddItemToCartCommandHandler(CartService cartService, ICust
             return Result.Failure(TicketTypeErrors.NotFound(request.TicketTypeId));
         }
 
+        if (ticketType.AvailableQuantity < request.Quantity)
+        {
+            return Result.Failure(TicketTypeErrors.NotEnoughQuantity(ticketType.AvailableQuantity));
+        }
+
         var cartItem = new CartItem
         {
             TicketTypeId = ticketType.Id,
