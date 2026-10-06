@@ -10,15 +10,15 @@ The reference case is user registration: `RegisterUserCommand` runs in **Users**
 
 ## The flow being tested
 
-Nothing in this chain is mocked. The tests exercise the real outbox, the real MassTransit (in-memory) bus, and the real inbox, each backed by its own PostgreSQL schema.
+Nothing in this chain is mocked. The tests exercise the real outbox, the real MassTransit bus over RabbitMQ, and the real inbox, each backed by its own PostgreSQL schema. Users runs in `Evently.Api` and Ticketing runs in `Evently.Ticketing.Api`, so the integration event crosses from one host to the other.
 
 ```mermaid
 sequenceDiagram
     participant T as Test
-    participant U as Users module
+    participant U as Users module (Evently.Api)
     participant UDB as users schema
-    participant BUS as MassTransit (in-memory)
-    participant K as Ticketing module
+    participant BUS as MassTransit (RabbitMQ)
+    participant K as Ticketing module (Evently.Ticketing.Api)
     participant KDB as ticketing schema
 
     T->>U: RegisterUserCommand
@@ -50,29 +50,39 @@ In `AddItemToCartTests` only the Users → Ticketing hop is cross-module. The ev
 
 ## How the tests are built
 
-### Real host, real infrastructure
+### Real hosts, real infrastructure
 
-[`IntegrationTestWebAppFactory`](Abstractions/IntegrationTestWebAppFactory.cs) boots the actual API (`WebApplicationFactory<Program>`) against containers started with Testcontainers:
+The tests boot both actual APIs against containers started with Testcontainers:
+
+| Factory | Host | Modules |
+| --- | --- | --- |
+| [`IntegrationTestWebAppFactory`](Abstractions/IntegrationTestWebAppFactory.cs) | `Evently.Api` (`WebApplicationFactory<Program>`) | Events, Users, Attendance |
+| [`TicketingApiFactory`](Abstractions/TicketingApiFactory.cs) | `Evently.Ticketing.Api` (`WebApplicationFactory<TicketingApi::Program>`) | Ticketing |
 
 | Container | Image | Used for |
 | --- | --- | --- |
 | PostgreSQL | `postgres:18` | All module schemas, outbox and inbox tables |
 | Redis | `redis:8` | Cache, cart storage |
+| RabbitMQ | `rabbitmq:4-management-alpine` | MassTransit bus shared by both hosts |
 | Keycloak | `quay.io/keycloak/keycloak:26.7` | Identity provider called by `RegisterUserCommand`; the `Evently` realm is imported from [`realm-export.json`](realm-export.json) |
 
-The host runs in the `Development` environment, so EF Core migrations are applied at startup.
+Both hosts run in the `Development` environment, so each applies the EF Core migrations of its own modules at startup.
+
+Both API projects declare a top-level `Program` in the global namespace. The `Evently.Ticketing.Api` project reference uses `Aliases="TicketingApi"`, so `Program` alone means `Evently.Api` and `TicketingApi::Program` means the Ticketing host.
 
 Connection strings and JWT settings are injected through environment variables. The Keycloak admin and token URLs are overridden with `ConfigureTestServices` instead, because `modules.*.json` files are added to the configuration *after* environment variables and would win over them.
 
-### One host for the whole run
+`IntegrationTestWebAppFactory` sets the environment variables when its host is built, and `TicketingApiFactory` reads the same ones. The Ticketing host must therefore be built second; `BaseIntegrationTest` does this by touching `factory.Services` before `factory.TicketingApi.Services`.
 
-[`IntegrationTestCollection`](Abstractions/IntegrationTestCollection.cs) registers the factory as an xUnit collection fixture, so the containers and the host start once and are shared by every test class.
+### Started once for the whole run
+
+[`IntegrationTestCollection`](Abstractions/IntegrationTestCollection.cs) registers the factory as an xUnit collection fixture, so the containers and both hosts start once and are shared by every test class. `IntegrationTestWebAppFactory` owns `TicketingApiFactory` and disposes it before stopping the containers.
 
 The database is **not** reset between tests. Each test generates its own data with Bogus (random email, names, ids), so tests do not depend on each other's rows.
 
 ### Commands and queries, not HTTP
 
-[`BaseIntegrationTest`](Abstractions/BaseIntegrationTest.cs) opens a DI scope on the running host and exposes `ISender`. Tests send the same MediatR commands and queries the endpoints would send, skipping the HTTP layer and authentication. Each module is used only through its public Application contracts.
+[`BaseIntegrationTest`](Abstractions/BaseIntegrationTest.cs) opens a DI scope on each running host and exposes one `ISender` per host: `Sender` for Events, Users and Attendance, `TicketingSender` for Ticketing. A command or query only has a handler in the host that runs its module, so it must go through that host's sender. Tests send the same MediatR commands and queries the endpoints would send, skipping the HTTP layer and authentication. Each module is used only through its public Application contracts.
 
 ### Waiting for eventual consistency
 
@@ -83,7 +93,7 @@ Propagation between modules is asynchronous: the outbox job and the inbox job ea
 ```csharp
 Result<CustomerViewModel> customerResult = await Poller.WaitAsync(
     TimeSpan.FromSeconds(35),
-    async () => await Sender.Send(new GetCustomerByIdQuery(userResult.Value)));
+    async () => await TicketingSender.Send(new GetCustomerByIdQuery(userResult.Value)));
 
 customerResult.IsSuccess.Should().BeTrue();
 ```
@@ -91,11 +101,11 @@ customerResult.IsSuccess.Should().BeTrue();
 ## Adding a scenario
 
 1. Create a folder named after the scenario and a test class deriving from `BaseIntegrationTest`.
-2. Send the command to the originating module through `Sender` and assert that it succeeded.
-3. Poll a query of the **destination** module with `Poller.WaitAsync` until the propagated data appears.
+2. Send the command to the originating module through the sender of the host that runs it (`Sender` or `TicketingSender`) and assert that it succeeded.
+3. Poll a query of the **destination** module, through its host's sender, with `Poller.WaitAsync` until the propagated data appears.
 4. Assert on the destination module's result.
 
-Shared arrange steps go in [`CommandHelpers`](Abstractions/CommandHelpers.cs) as `ISender` extension methods.
+Shared arrange steps go in [`CommandHelpers`](Abstractions/CommandHelpers.cs) as `ISender` extension methods. Call them on the sender of the module they target: `CreateEventAsync` sends Ticketing's `CreateEventCommand`, so it runs on `TicketingSender`.
 
 ## Running
 

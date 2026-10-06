@@ -16,7 +16,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\src\API\Evently.Api\Evently.Api.csproj" />
+	  <ProjectReference Include="..\..\..\..\src\API\Evently.Ticketing.Api\Evently.Ticketing.Api.csproj" />
+	  <ProjectReference Include="..\..\..\..\src\Modules\Ticketing\Evently.Modules.Ticketing.Application\Evently.Modules.Ticketing.Application.csproj" />
+	  <ProjectReference Include="..\..\..\..\src\Modules\Ticketing\Evently.Modules.Ticketing.Infrastructure\Evently.Modules.Ticketing.Infrastructure.csproj" />
 	</ItemGroup>
 
   <ItemGroup>

@@ -33,6 +33,8 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         .WithCommand("--import-realm")
         .Build();
 
+    public TicketingApiFactory TicketingApi { get; } = new();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         Environment.SetEnvironmentVariable("ConnectionStrings:Database", _dbContainer.GetConnectionString());
@@ -69,6 +71,8 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
     public new async Task DisposeAsync()
     {
+        await TicketingApi.DisposeAsync();
+
         await _dbContainer.StopAsync();
         await _redisContainer.StopAsync();
         await _rabbitMqContainer.StopAsync();

@@ -37,7 +37,7 @@ public class RegisterUserTests : BaseIntegrationTest
             {
                 var query = new GetCustomerByIdQuery(userResult.Value);
 
-                Result<CustomerViewModel> customerResult = await Sender.Send(query);
+                Result<CustomerViewModel> customerResult = await TicketingSender.Send(query);
 
                 return customerResult;
             });

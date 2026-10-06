@@ -38,7 +38,7 @@ public sealed class AddItemToCartTests : BaseIntegrationTest
             {
                 var query = new GetCustomerByIdQuery(userResult.Value);
 
-                Result<CustomerViewModel> customerResult = await Sender.Send(query);
+                Result<CustomerViewModel> customerResult = await TicketingSender.Send(query);
 
                 return customerResult;
             });
@@ -49,9 +49,9 @@ public sealed class AddItemToCartTests : BaseIntegrationTest
         CustomerViewModel customer = customerResult.Value;
         var ticketTypeId = Guid.NewGuid();
 
-        await Sender.CreateEventAsync(Guid.NewGuid(), ticketTypeId, Quantity);
+        await TicketingSender.CreateEventAsync(Guid.NewGuid(), ticketTypeId, Quantity);
 
-        Result result = await Sender.Send(new AddItemToCartCommand(customer.Id, ticketTypeId, Quantity));
+        Result result = await TicketingSender.Send(new AddItemToCartCommand(customer.Id, ticketTypeId, Quantity));
 
         // Assert
         result.IsSuccess.Should().BeTrue();
