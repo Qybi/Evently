@@ -13,11 +13,13 @@ namespace Evently.Modules.Events.Presentation.Categories;
 
 internal sealed class GetCategories : IEndpoint
 {
+    internal const string CacheKey = "categories";
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("categories", async (ISender sender, ICacheService cacheService) =>
         {
-            IReadOnlyCollection<CategoryViewModel> cachedCategories = await cacheService.GetAsync<IReadOnlyCollection<CategoryViewModel>>("categories");
+            IReadOnlyCollection<CategoryViewModel> cachedCategories = await cacheService.GetAsync<IReadOnlyCollection<CategoryViewModel>>(CacheKey);
 
             if (cachedCategories is not null)
             {
@@ -28,7 +30,7 @@ internal sealed class GetCategories : IEndpoint
 
             if (result.IsSuccess)
             {
-                await cacheService.SetAsync("categories", result.Value);
+                await cacheService.SetAsync(CacheKey, result.Value);
             }
 
             return result.Match(Results.Ok, ApiResults.Problem);
