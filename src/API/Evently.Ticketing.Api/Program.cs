@@ -1,14 +1,12 @@
-using Evently.Api.Extensions;
-using Evently.Api.Middleware;
-using Evently.Api.OpenTelemetry;
-using Evently.Modules.Attendance.Infrastructure;
-using Evently.Modules.Events.Infrastructure;
-using Evently.Modules.Users.Infrastructure;
+using Evently.Modules.Ticketing.Infrastructure;
 using Evently.Shared.Application;
 using Evently.Shared.Infrastructure;
 using Evently.Shared.Infrastructure.Configuration;
 using Evently.Shared.Infrastructure.EventBus;
 using Evently.Shared.Presentation.Endpoints;
+using Evently.Ticketing.Api.Extensions;
+using Evently.Ticketing.Api.Middleware;
+using Evently.Ticketing.Api.OpenTelemetry;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.OpenApi;
@@ -27,9 +25,9 @@ builder.Services.AddOpenApi(options =>
     {
         document.Info = new OpenApiInfo
         {
-            Title = "Evently API",
+            Title = "Evently Ticketing API",
             Version = "v1",
-            Description = "API for Evently, a modular monolith event management platform."
+            Description = "API for Evently Ticketing, a service for managing event tickets."
         };
 
         return Task.CompletedTask;
@@ -37,9 +35,7 @@ builder.Services.AddOpenApi(options =>
 });
 
 builder.Services.AddApplication([
-    Evently.Modules.Events.Application.AssemblyReference.Assembly,
-    Evently.Modules.Users.Application.AssemblyReference.Assembly,
-    Evently.Modules.Attendance.Application.AssemblyReference.Assembly
+    Evently.Modules.Ticketing.Application.AssemblyReference.Assembly
 ]);
 
 string cacheConnectionString = builder.Configuration.GetConnectionStringOrThrow("Cache");
@@ -48,19 +44,16 @@ RabbitMqSettings rabbitMqSettings = new(builder.Configuration.GetConnectionStrin
 builder.Services.AddInfrastructure(
     DiagnosticsConfig.ServiceName,
     [
-        EventsModule.ConfigureConsumers(cacheConnectionString),
-        AttendanceModule.ConfigureConsumers
+        TicketingModule.ConfigureConsumers,
     ],
     rabbitMqSettings,
     cacheConnectionString);
 
-builder.Configuration.AddModuleConfiguration(["events", "users", "attendance"]);
+builder.Configuration.AddModuleConfiguration(["ticketing"]);
 
 builder.Services.AddHealthChecksInternal(builder.Configuration);
 
-builder.Services.AddEventsModule(builder.Configuration);
-builder.Services.AddUsersModule(builder.Configuration);
-builder.Services.AddAttendanceModule(builder.Configuration);
+builder.Services.AddTicketingModule(builder.Configuration);
 
 WebApplication app = builder.Build();
 
