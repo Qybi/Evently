@@ -49,7 +49,8 @@ builder.Services.AddInfrastructure(
     DiagnosticsConfig.ServiceName,
     [
         EventsModule.ConfigureConsumers(cacheConnectionString),
-        AttendanceModule.ConfigureConsumers
+        AttendanceModule.ConfigureConsumers,
+        UsersModule.ConfigureConsumers
     ],
     rabbitMqSettings,
     cacheConnectionString);

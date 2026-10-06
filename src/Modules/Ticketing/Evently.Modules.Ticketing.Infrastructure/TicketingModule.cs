@@ -10,6 +10,7 @@ using Evently.Modules.Ticketing.Application.Payments;
 using Evently.Modules.Ticketing.Application.Tickets;
 using Evently.Modules.Ticketing.Application.TicketTypes;
 using Evently.Modules.Ticketing.Infrastructure.Authentication;
+using Evently.Modules.Ticketing.Infrastructure.Authorization;
 using Evently.Modules.Ticketing.Infrastructure.Database;
 using Evently.Modules.Ticketing.Infrastructure.Events;
 using Evently.Modules.Ticketing.Infrastructure.Inbox;
@@ -19,6 +20,7 @@ using Evently.Modules.Ticketing.Infrastructure.Queries;
 using Evently.Modules.Ticketing.Infrastructure.Repositories;
 using Evently.Modules.Ticketing.Infrastructure.Tickets;
 using Evently.Modules.Users.IntegrationEvents;
+using Evently.Shared.Application.Authorization;
 using Evently.Shared.Application.EventBus;
 using Evently.Shared.Application.Messaging;
 using Evently.Shared.Infrastructure.Outbox;
@@ -92,6 +94,8 @@ public static class TicketingModule
         services.AddSingleton<IPaymentService, PaymentService>();
 
         services.AddScoped<ICustomerContext, CustomerContext>();
+
+        services.AddScoped<IPermissionService, PermissionService>();
 
         services.Configure<OutboxOptions>(configuration.GetSection("Ticketing:Outbox"));
         services.AddQuartz(quartz => quartz.AddProcessOutboxJob());
