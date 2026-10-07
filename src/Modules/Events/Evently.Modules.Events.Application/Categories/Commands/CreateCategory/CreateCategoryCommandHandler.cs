@@ -8,7 +8,7 @@ namespace Evently.Modules.Events.Application.Categories.Commands.CreateCategory;
 internal sealed class CreateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<CreateCategoryCommand, Guid>
 {
-    public async Task<Result<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken = default)
     {
         var category = Category.Create(request.Name);
 

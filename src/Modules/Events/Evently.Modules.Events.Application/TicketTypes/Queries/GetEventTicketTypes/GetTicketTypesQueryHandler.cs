@@ -9,7 +9,7 @@ internal sealed class GetEventTicketTypesQueryHandler(ITicketTypeQueries ticketT
 {
     public async Task<Result<IReadOnlyCollection<TicketTypeViewModel>>> Handle(
         GetEventTicketTypesQuery request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         IReadOnlyCollection<TicketTypeViewModel> ticketTypes =
             await ticketTypeQueries.GetEventTicketTypesAsync(request.EventId, cancellationToken);

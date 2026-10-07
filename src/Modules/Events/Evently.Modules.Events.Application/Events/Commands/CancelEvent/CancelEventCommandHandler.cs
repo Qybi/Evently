@@ -13,7 +13,7 @@ internal sealed class CancelEventCommandHandler(
     IUnitOfWork unitOfWork)
     : ICommandHandler<CancelEventCommand>
 {
-    public async Task<Result> Handle(CancelEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CancelEventCommand request, CancellationToken cancellationToken = default)
     {
         Event? @event = await eventRepository.GetAsync(request.EventId, cancellationToken);
 

@@ -7,7 +7,7 @@ namespace Evently.Modules.Events.Application.Events.Queries.GetEvent;
 
 internal sealed class GetEventQueryHandler(IEventQueries eventQueries) : IQueryHandler<GetEventQuery, EventViewModel>
 {
-    public async Task<Result<EventViewModel>> Handle(GetEventQuery query, CancellationToken cancellationToken)
+    public async Task<Result<EventViewModel>> Handle(GetEventQuery query, CancellationToken cancellationToken = default)
     {
         EventViewModel? eventViewModel = await eventQueries.GetAsync(query.EventId, cancellationToken);
 

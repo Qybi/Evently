@@ -13,7 +13,7 @@ internal sealed class RescheduleEventCommandHandler(
     IUnitOfWork unitOfWork)
     : ICommandHandler<RescheduleEventCommand>
 {
-    public async Task<Result> Handle(RescheduleEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(RescheduleEventCommand request, CancellationToken cancellationToken = default)
     {
         Event? @event = await eventRepository.GetAsync(request.EventId, cancellationToken);
 
