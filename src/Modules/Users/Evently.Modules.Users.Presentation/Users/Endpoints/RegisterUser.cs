@@ -1,8 +1,8 @@
 ﻿using Evently.Modules.Users.Application.Users.Commands.RegisterUser;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -13,13 +13,18 @@ internal sealed class RegisterUser : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("users/register", async (Request request, ISender sender) =>
+        app.MapPost("users/register", async (
+            Request request,
+            ICommandHandler<RegisterUserCommand, Guid> handler,
+            CancellationToken cancellationToken) =>
         {
-            Result<Guid> result = await sender.Send(new RegisterUserCommand(
-                request.Email,
-                request.Password,
-                request.FirstName,
-                request.LastName));
+            Result<Guid> result = await handler.Handle(
+                new RegisterUserCommand(
+                    request.Email,
+                    request.Password,
+                    request.FirstName,
+                    request.LastName),
+                cancellationToken);
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })

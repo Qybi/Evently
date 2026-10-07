@@ -7,7 +7,7 @@ namespace Evently.Modules.Users.Application.Users.Queries.GetUser;
 
 internal sealed class GetUserQueryHandler(IUserQueries userQueries) : IQueryHandler<GetUserQuery, UserViewModel>
 {
-    public async Task<Result<UserViewModel>> Handle(GetUserQuery request, CancellationToken cancellationToken)
+    public async Task<Result<UserViewModel>> Handle(GetUserQuery request, CancellationToken cancellationToken = default)
     {
         UserViewModel? userViewModel = await userQueries.GetAsync(request.UserId, cancellationToken);
 

@@ -9,7 +9,7 @@ namespace Evently.Modules.Users.Application.Users.Commands.RegisterUser;
 internal sealed class RegisterUserCommandHandler(IIdentityProviderService identityProviderService, IUserRepository userRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<RegisterUserCommand, Guid>
 {
-    public async Task<Result<Guid>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(RegisterUserCommand request, CancellationToken cancellationToken = default)
     {
         Result<string> result = await identityProviderService.RegisterUserAsync(new UserModel(request.Email, request.Password, request.FirstName, request.LastName), cancellationToken);
 
