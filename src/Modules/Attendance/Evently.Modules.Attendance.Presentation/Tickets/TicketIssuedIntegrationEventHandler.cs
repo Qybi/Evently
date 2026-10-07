@@ -2,19 +2,19 @@
 using Evently.Modules.Ticketing.IntegrationEvents;
 using Evently.Shared.Application.EventBus;
 using Evently.Shared.Application.Exceptions;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
-using MediatR;
 
 namespace Evently.Modules.Attendance.Presentation.Tickets;
 
-internal sealed class TicketIssuedIntegrationEventHandler(ISender sender)
+internal sealed class TicketIssuedIntegrationEventHandler(ICommandHandler<CreateTicketCommand> handler)
     : IntegrationEventHandler<TicketIssuedIntegrationEvent>
 {
     public override async Task Handle(
         TicketIssuedIntegrationEvent integrationEvent,
         CancellationToken cancellationToken = default)
     {
-        Result result = await sender.Send(
+        Result result = await handler.Handle(
             new CreateTicketCommand(
                 integrationEvent.TicketId,
                 integrationEvent.CustomerId,

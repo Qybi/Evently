@@ -8,7 +8,7 @@ namespace Evently.Modules.Attendance.Application.Attendees.Commands.CreateAttend
 internal sealed class CreateAttendeeCommandHandler(IAttendeeRepository attendeeRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<CreateAttendeeCommand>
 {
-    public async Task<Result> Handle(CreateAttendeeCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateAttendeeCommand request, CancellationToken cancellationToken = default)
     {
         var attendee = Attendee.Create(request.AttendeeId, request.Email, request.FirstName, request.LastName);
 
