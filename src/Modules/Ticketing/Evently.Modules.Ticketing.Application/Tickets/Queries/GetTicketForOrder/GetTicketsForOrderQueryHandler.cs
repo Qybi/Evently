@@ -6,7 +6,7 @@ namespace Evently.Modules.Ticketing.Application.Tickets.Queries.GetTicketForOrde
 
 internal sealed class GetTicketsForOrderQueryHandler(ITicketQueries ticketQueries) : IQueryHandler<GetTicketsForOrderQuery, IReadOnlyCollection<TicketViewModel>>
 {
-    public async Task<Result<IReadOnlyCollection<TicketViewModel>>> Handle(GetTicketsForOrderQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyCollection<TicketViewModel>>> Handle(GetTicketsForOrderQuery request, CancellationToken cancellationToken = default)
     {
         IReadOnlyCollection<TicketViewModel> tickets = await ticketQueries.GetTicketsForOrderAsync(request.OrderId, cancellationToken);
 

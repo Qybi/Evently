@@ -23,7 +23,7 @@ internal sealed class CreateOrderCommandHandler(
     CartService cartService,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateOrderCommand>
 {
-    public async Task<Result> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateOrderCommand request, CancellationToken cancellationToken = default)
     {
         await using ITransaction transaction =await unitOfWork.BeginTransactionAsync(cancellationToken);
 

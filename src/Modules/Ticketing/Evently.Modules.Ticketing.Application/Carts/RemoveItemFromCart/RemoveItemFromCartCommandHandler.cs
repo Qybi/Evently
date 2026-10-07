@@ -14,7 +14,7 @@ internal sealed class RemoveItemFromCartCommandHandler(
     CartService cartService)
     : ICommandHandler<RemoveItemFromCartCommand>
 {
-    public async Task<Result> Handle(RemoveItemFromCartCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(RemoveItemFromCartCommand request, CancellationToken cancellationToken = default)
     {
         Customer? customer = await customerRepository.GetAsync(request.CustomerId, cancellationToken);
 

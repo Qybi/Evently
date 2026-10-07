@@ -8,7 +8,7 @@ namespace Evently.Modules.Ticketing.Application.Tickets.Queries.GetTicket;
 internal sealed class GetTicketQueryHandler(ITicketQueries ticketQueries)
     : IQueryHandler<GetTicketQuery, TicketViewModel>
 {
-    public async Task<Result<TicketViewModel>> Handle(GetTicketQuery request, CancellationToken cancellationToken)
+    public async Task<Result<TicketViewModel>> Handle(GetTicketQuery request, CancellationToken cancellationToken = default)
     {
         TicketViewModel? ticket = await ticketQueries.GetTicketAsync(request.TicketId, cancellationToken);
 

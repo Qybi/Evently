@@ -11,7 +11,7 @@ namespace Evently.Modules.Ticketing.Application.Payments.Commands.RefundPayments
 internal sealed class RefundPaymentsForEventCommandHandler(IEventRepository eventRepository, IPaymentRepository paymentRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<RefundPaymentsForEventCommand>
 {
-    public async Task<Result> Handle(RefundPaymentsForEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(RefundPaymentsForEventCommand request, CancellationToken cancellationToken = default)
     {
         await using ITransaction transaction =await unitOfWork.BeginTransactionAsync(cancellationToken);
 
