@@ -26,7 +26,7 @@ public class RegisterUserTests : BaseIntegrationTest
             Faker.Name.FirstName(),
             Faker.Name.LastName());
 
-        Result<Guid> userResult = await Sender.Send(command);
+        Result<Guid> userResult = await SendCommand<RegisterUserCommand, Guid>(command);
 
         userResult.IsSuccess.Should().BeTrue();
 
@@ -37,7 +37,7 @@ public class RegisterUserTests : BaseIntegrationTest
             {
                 var query = new GetCustomerByIdQuery(userResult.Value);
 
-                Result<CustomerViewModel> customerResult = await TicketingSender.Send(query);
+                Result<CustomerViewModel> customerResult = await SendTicketingQuery<GetCustomerByIdQuery, CustomerViewModel>(query);
 
                 return customerResult;
             });
@@ -57,7 +57,7 @@ public class RegisterUserTests : BaseIntegrationTest
             Faker.Name.FirstName(),
             Faker.Name.LastName());
 
-        Result<Guid> userResult = await Sender.Send(command);
+        Result<Guid> userResult = await SendCommand<RegisterUserCommand, Guid>(command);
 
         userResult.IsSuccess.Should().BeTrue();
 
@@ -68,7 +68,7 @@ public class RegisterUserTests : BaseIntegrationTest
             {
                 var query = new GetAttendeeQuery(userResult.Value);
 
-                Result<AttendeeViewModel> attendeeResult = await Sender.Send(query);
+                Result<AttendeeViewModel> attendeeResult = await SendQuery<GetAttendeeQuery, AttendeeViewModel>(query);
 
                 return attendeeResult;
             });
