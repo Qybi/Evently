@@ -23,7 +23,7 @@ public class CreateAttendeeTests : BaseIntegrationTest
             string.Empty);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -40,7 +40,7 @@ public class CreateAttendeeTests : BaseIntegrationTest
             Faker.Name.LastName());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
