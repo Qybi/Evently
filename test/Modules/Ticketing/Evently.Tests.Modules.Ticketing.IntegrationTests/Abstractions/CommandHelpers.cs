@@ -3,16 +3,15 @@ using Bogus;
 using Evently.Modules.Ticketing.Application.Customers.Commands.CreateCustomer;
 using Evently.Modules.Ticketing.Application.Events.Commands.CreateEvent;
 using Evently.Shared.Domain;
-using MediatR;
 
 namespace Evently.Tests.Modules.Ticketing.IntegrationTests.Abstractions;
 
-internal static class CommandHelpers
+public abstract partial class BaseIntegrationTest
 {
-    internal static async Task<Guid> CreateCustomerAsync(this ISender sender, Guid customerId)
+    protected async Task<Guid> CreateCustomerAsync(Guid customerId)
     {
         var faker = new Faker();
-        Result result = await sender.Send(
+        Result result = await SendCommand(
             new CreateCustomerCommand(
                 customerId,
                 faker.Internet.Email(),
@@ -24,8 +23,7 @@ internal static class CommandHelpers
         return customerId;
     }
 
-    internal static async Task CreateEventWithTicketTypeAsync(
-        this ISender sender,
+    protected async Task CreateEventWithTicketTypeAsync(
         Guid eventId,
         Guid ticketTypeId,
         decimal quantity)
@@ -40,7 +38,7 @@ internal static class CommandHelpers
             "USD",
             quantity);
 
-        Result result = await sender.Send(new CreateEventCommand(
+        Result result = await SendCommand(new CreateEventCommand(
             eventId,
             faker.Music.Genre(),
             faker.Music.Genre(),

@@ -26,7 +26,7 @@ public class RescheduleEventTests : BaseIntegrationTest
         var command = new RescheduleEventCommand(eventId, startsAtUtc, endsAtUtc);
 
         //Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         //Assert
         result.Error.Should().Be(EventErrors.NotFound(command.EventId));
@@ -41,12 +41,12 @@ public class RescheduleEventTests : BaseIntegrationTest
         DateTime startsAtUtc = DateTime.UtcNow.AddMinutes(-5);
         DateTime endsAtUtc = startsAtUtc.AddHours(1);
 
-        await Sender.CreateEventWithTicketTypeAsync(eventId, ticketTypeId, Quantity);
+        await CreateEventWithTicketTypeAsync(eventId, ticketTypeId, Quantity);
 
         var command = new RescheduleEventCommand(eventId, startsAtUtc, endsAtUtc);
 
         //Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         //Assert
         result.Error.Should().Be(EventErrors.StartDateInPast);
@@ -61,12 +61,12 @@ public class RescheduleEventTests : BaseIntegrationTest
         DateTime startsAtUtc = DateTime.UtcNow.AddMinutes(10);
         DateTime endsAtUtc = startsAtUtc.AddHours(1);
 
-        await Sender.CreateEventWithTicketTypeAsync(eventId, ticketTypeId, Quantity);
+        await CreateEventWithTicketTypeAsync(eventId, ticketTypeId, Quantity);
 
         var command = new RescheduleEventCommand(eventId, startsAtUtc, endsAtUtc);
 
         //Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         //Assert
         result.IsSuccess.Should().BeTrue();

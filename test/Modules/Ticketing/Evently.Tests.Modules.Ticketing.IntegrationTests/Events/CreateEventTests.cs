@@ -38,7 +38,7 @@ public class CreateEventTests : BaseIntegrationTest
             [ticketType]);
 
         //Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         //Assert
         result.IsSuccess.Should().BeTrue();
