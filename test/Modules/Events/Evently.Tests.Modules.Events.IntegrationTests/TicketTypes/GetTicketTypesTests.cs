@@ -22,7 +22,7 @@ public class GetTicketTypesTests : BaseIntegrationTest
         var query = new GetEventTicketTypesQuery(Guid.NewGuid());
 
         // Act
-        Result<IReadOnlyCollection<TicketTypeViewModel>> result = await Sender.Send(query);
+        Result<IReadOnlyCollection<TicketTypeViewModel>> result = await SendQuery<GetEventTicketTypesQuery, IReadOnlyCollection<TicketTypeViewModel>>(query);
 
         // Assert
         result.Value.Should().BeEmpty();
@@ -34,16 +34,16 @@ public class GetTicketTypesTests : BaseIntegrationTest
         // Arrange
         await CleanDatabaseAsync();
 
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await CreateEventAsync(categoryId);
 
-        await Sender.CreateTicketTypeAsync(eventId);
-        await Sender.CreateTicketTypeAsync(eventId);
+        await CreateTicketTypeAsync(eventId);
+        await CreateTicketTypeAsync(eventId);
 
         var query = new GetEventTicketTypesQuery(eventId);
 
         // Act
-        Result<IReadOnlyCollection<TicketTypeViewModel>> result = await Sender.Send(query);
+        Result<IReadOnlyCollection<TicketTypeViewModel>> result = await SendQuery<GetEventTicketTypesQuery, IReadOnlyCollection<TicketTypeViewModel>>(query);
 
         // Assert
         result.Value.Should().HaveCount(2);

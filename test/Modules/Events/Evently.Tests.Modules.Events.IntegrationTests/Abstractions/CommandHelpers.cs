@@ -3,26 +3,24 @@ using Evently.Modules.Events.Application.Categories.Commands.CreateCategory;
 using Evently.Modules.Events.Application.Events.Commands.CreateEvent;
 using Evently.Modules.Events.Application.TicketTypes.Commands.CreateTicketType;
 using Evently.Shared.Domain;
-using MediatR;
 
 namespace Evently.Tests.Modules.Events.IntegrationTests.Abstractions;
 
-internal static class CommandHelpers
+public abstract partial class BaseIntegrationTest
 {
-    internal static async Task<Guid> CreateCategoryAsync(this ISender sender, string name)
+    protected async Task<Guid> CreateCategoryAsync(string name)
     {
-        Result<Guid> result = await sender.Send(new CreateCategoryCommand(name));
+        Result<Guid> result = await SendCommand<CreateCategoryCommand, Guid>(new CreateCategoryCommand(name));
 
         return result.Value;
     }
 
-    internal static async Task<Guid> CreateEventAsync(
-        this ISender sender,
+    protected async Task<Guid> CreateEventAsync(
         Guid categoryId,
         DateTime? startsAtUtc = null)
     {
         var faker = new Faker();
-        Result<Guid> result = await sender.Send(
+        Result<Guid> result = await SendCommand<CreateEventCommand, Guid>(
             new CreateEventCommand(
                 categoryId,
                 faker.Music.Genre(),
@@ -34,10 +32,10 @@ internal static class CommandHelpers
         return result.Value;
     }
 
-    internal static async Task<Guid> CreateTicketTypeAsync(this ISender sender, Guid eventId)
+    protected async Task<Guid> CreateTicketTypeAsync(Guid eventId)
     {
         var faker = new Faker();
-        Result<Guid> result = await sender.Send(
+        Result<Guid> result = await SendCommand<CreateTicketTypeCommand, Guid>(
             new CreateTicketTypeCommand(
                 eventId,
                 faker.Commerce.ProductName(),

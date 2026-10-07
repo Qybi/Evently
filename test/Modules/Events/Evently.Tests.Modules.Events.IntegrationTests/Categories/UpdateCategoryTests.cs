@@ -25,7 +25,7 @@ public class UpdateCategoryTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenCommandIsNotValid(UpdateCategoryCommand command)
     {
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -39,7 +39,7 @@ public class UpdateCategoryTests : BaseIntegrationTest
         var command = new UpdateCategoryCommand(Guid.NewGuid(), Faker.Music.Genre());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(CategoryErrors.NotFound(command.CategoryId));
@@ -49,12 +49,12 @@ public class UpdateCategoryTests : BaseIntegrationTest
     public async Task Should_UpdateCategory_WhenCategoryExists()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
 
         var command = new UpdateCategoryCommand(categoryId, Faker.Music.Genre());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

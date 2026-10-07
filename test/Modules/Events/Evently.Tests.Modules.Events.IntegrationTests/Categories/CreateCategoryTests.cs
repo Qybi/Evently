@@ -20,7 +20,7 @@ public class CreateCategoryTests : BaseIntegrationTest
         var command = new CreateCategoryCommand("Category name");
 
         // Act
-        Result<Guid> result = await Sender.Send(command);
+        Result<Guid> result = await SendCommand<CreateCategoryCommand, Guid>(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -34,7 +34,7 @@ public class CreateCategoryTests : BaseIntegrationTest
         var command = new CreateCategoryCommand("");
 
         // Act
-        Result<Guid> result = await Sender.Send(command);
+        Result<Guid> result = await SendCommand<CreateCategoryCommand, Guid>(command);
 
         // Assert
         result.IsFailure.Should().BeTrue();
