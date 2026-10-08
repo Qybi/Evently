@@ -24,7 +24,8 @@ internal sealed class CreateCategory : IEndpoint
 
             if (result.IsSuccess)
             {
-                await cacheService.RemoveAsync(GetCategories.CacheKey, cancellationToken);
+                // DB already committed: invalidation must run even if the client disconnected
+                await cacheService.RemoveAsync(GetCategories.CacheKey, CancellationToken.None);
             }
 
             return result.Match(Results.Ok, ApiResults.Problem);
