@@ -22,7 +22,7 @@ public class GetCategoriesTests : BaseIntegrationTest
         var query = new GetCategoriesQuery();
 
         // Act
-        Result<IReadOnlyCollection<CategoryViewModel>> result = await Sender.Send(query);
+        Result<IReadOnlyCollection<CategoryViewModel>> result = await SendQuery<GetCategoriesQuery, IReadOnlyCollection<CategoryViewModel>>(query);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -35,13 +35,13 @@ public class GetCategoriesTests : BaseIntegrationTest
         // Arrange
         await CleanDatabaseAsync();
 
-        await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        await Sender.CreateCategoryAsync(Faker.Music.Genre());
+        await CreateCategoryAsync(Faker.Music.Genre());
+        await CreateCategoryAsync(Faker.Music.Genre());
 
         var query = new GetCategoriesQuery();
 
         // Act
-        Result<IReadOnlyCollection<CategoryViewModel>> result = await Sender.Send(query);
+        Result<IReadOnlyCollection<CategoryViewModel>> result = await SendQuery<GetCategoriesQuery, IReadOnlyCollection<CategoryViewModel>>(query);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

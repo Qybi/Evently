@@ -9,7 +9,7 @@ internal sealed class SearchEventsQueryHandler(IEventQueries eventQueries)
 {
     public async Task<Result<SearchEventsViewModel>> Handle(
         SearchEventsQuery request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         SearchEventsViewModel events = await eventQueries.SearchAsync(
             request.CategoryId,

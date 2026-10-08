@@ -9,7 +9,7 @@ namespace Evently.Modules.Events.Application.Categories.UpdateCategory;
 internal sealed class UpdateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<UpdateCategoryCommand>
 {
-    public async Task<Result> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken = default)
     {
         Category? category = await categoryRepository.GetAsync(request.CategoryId, cancellationToken);
 

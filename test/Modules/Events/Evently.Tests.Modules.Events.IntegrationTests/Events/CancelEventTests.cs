@@ -23,7 +23,7 @@ public class CancelEventTests : BaseIntegrationTest
         var command = new CancelEventCommand(eventId);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.NotFound(eventId));
@@ -33,15 +33,15 @@ public class CancelEventTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenEventAlreadyCanceled()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await CreateEventAsync(categoryId);
 
         var command = new CancelEventCommand(eventId);
 
-        await Sender.Send(command);
+        await SendCommand(command);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.AlreadyCanceled);
@@ -51,16 +51,16 @@ public class CancelEventTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenEventAlreadyStarted()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
 
-        Guid eventId = await Sender.CreateEventAsync(categoryId, DateTime.UtcNow.AddMinutes(5));
+        Guid eventId = await CreateEventAsync(categoryId, DateTime.UtcNow.AddMinutes(5));
 
         Factory.DateTimeProviderMock.UtcNow.Returns(DateTime.UtcNow.AddMinutes(15));
 
         var command = new CancelEventCommand(eventId);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.AlreadyStarted);
@@ -72,13 +72,13 @@ public class CancelEventTests : BaseIntegrationTest
     public async Task Should_ReturnSuccess_WhenEventIsCanceled()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await CreateEventAsync(categoryId);
 
         var command = new CancelEventCommand(eventId);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

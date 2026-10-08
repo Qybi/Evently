@@ -28,7 +28,7 @@ public class CreateOrderTests : BaseIntegrationTest
         var command = new CreateOrderCommand(Guid.NewGuid());
 
         //Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         //Assert
         result.Error.Should().Be(CustomerErrors.NotFound(command.CustomerId));
@@ -38,12 +38,12 @@ public class CreateOrderTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenCartIsEmpty()
     {
         //Arrange
-        Guid customerId = await Sender.CreateCustomerAsync(Guid.NewGuid());
+        Guid customerId = await CreateCustomerAsync(Guid.NewGuid());
 
         var command = new CreateOrderCommand(customerId);
 
         //Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         //Assert
         result.Error.Should().Be(CartErrors.Empty);
@@ -53,20 +53,20 @@ public class CreateOrderTests : BaseIntegrationTest
     public async Task Should_IssueTickets_WhenOrderIsCreated()
     {
         //Arrange
-        Guid customerId = await Sender.CreateCustomerAsync(Guid.NewGuid());
+        Guid customerId = await CreateCustomerAsync(Guid.NewGuid());
         var eventId = Guid.NewGuid();
         var ticketTypeId = Guid.NewGuid();
 
-        await Sender.CreateEventWithTicketTypeAsync(eventId, ticketTypeId, Quantity);
-        await Sender.Send(new AddItemToCartCommand(customerId, ticketTypeId, Quantity));
+        await CreateEventWithTicketTypeAsync(eventId, ticketTypeId, Quantity);
+        await SendCommand(new AddItemToCartCommand(customerId, ticketTypeId, Quantity));
 
         //Act
-        Result result = await Sender.Send(new CreateOrderCommand(customerId));
+        Result result = await SendCommand(new CreateOrderCommand(customerId));
 
         //Assert
         result.IsSuccess.Should().BeTrue();
 
-        Result<IReadOnlyCollection<GetOrdersViewModel>> ordersResult = await Sender.Send(new GetOrdersQuery(customerId));
+        Result<IReadOnlyCollection<GetOrdersViewModel>> ordersResult = await SendQuery<GetOrdersQuery, IReadOnlyCollection<GetOrdersViewModel>>(new GetOrdersQuery(customerId));
         Guid orderId = ordersResult.Value.Single().Id;
 
         // Tickets are issued asynchronously by the outbox job.
@@ -76,7 +76,7 @@ public class CreateOrderTests : BaseIntegrationTest
 
         while (tickets.Count == 0 && DateTime.UtcNow < endTimeUtc && await timer.WaitForNextTickAsync())
         {
-            Result<IReadOnlyCollection<TicketViewModel>> ticketsResult = await Sender.Send(new GetTicketsForOrderQuery(orderId));
+            Result<IReadOnlyCollection<TicketViewModel>> ticketsResult = await SendQuery<GetTicketsForOrderQuery, IReadOnlyCollection<TicketViewModel>>(new GetTicketsForOrderQuery(orderId));
             tickets = ticketsResult.Value;
         }
 

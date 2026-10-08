@@ -17,7 +17,7 @@ internal sealed class CheckInAttendeeCommandHandler(
     ILogger<CheckInAttendeeCommandHandler> logger)
     : ICommandHandler<CheckInAttendeeCommand>
 {
-    public async Task<Result> Handle(CheckInAttendeeCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CheckInAttendeeCommand request, CancellationToken cancellationToken = default)
     {
         Attendee? attendee = await attendeeRepository.GetAsync(request.AttendeeId, cancellationToken);
 

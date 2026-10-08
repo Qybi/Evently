@@ -1,0 +1,68 @@
+﻿using Evently.Shared.Application.Exceptions;
+using Evently.Shared.Application.Messaging;
+using Evently.Shared.Domain;
+using Microsoft.Extensions.Logging;
+
+namespace Evently.Shared.Application.Behaviours;
+
+// cancellations caused by the caller's token are not failures: they are rethrown as-is,
+// so ASP.NET Core can treat them as a client disconnect instead of a 500
+internal static class ExceptionHandlingDecorator
+{
+    internal sealed class CommandHandler<TCommand>(
+        ICommandHandler<TCommand> innerHandler,
+        ILogger<CommandHandler<TCommand>> logger) : ICommandHandler<TCommand> where TCommand : ICommand
+    {
+        public async Task<Result> Handle(TCommand command, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await innerHandler.Handle(command, cancellationToken);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+            {
+                logger.LogError(exception, "Unhandled exception for {CommandName}", typeof(TCommand).Name);
+
+                throw new EventlyException(typeof(TCommand).Name, innerException: exception);
+            }
+        }
+    }
+
+    internal sealed class CommandHandlerT<TCommand, TResponse>(
+        ICommandHandler<TCommand, TResponse> innerHandler,
+        ILogger<CommandHandlerT<TCommand, TResponse>> logger) : ICommandHandler<TCommand, TResponse> where TCommand : ICommand<TResponse>
+    {
+        public async Task<Result<TResponse>> Handle(TCommand command, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await innerHandler.Handle(command, cancellationToken);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+            {
+                logger.LogError(exception, "Unhandled exception for {CommandName}", typeof(TCommand).Name);
+
+                throw new EventlyException(typeof(TCommand).Name, innerException: exception);
+            }
+        }
+    }
+
+    internal sealed class QueryHandler<TQuery, TResponse>(
+        IQueryHandler<TQuery, TResponse> innerHandler,
+        ILogger<QueryHandler<TQuery, TResponse>> logger) : IQueryHandler<TQuery, TResponse> where TQuery : IQuery<TResponse>
+    {
+        public async Task<Result<TResponse>> Handle(TQuery query, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await innerHandler.Handle(query, cancellationToken);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+            {
+                logger.LogError(exception, "Unhandled exception for {QueryName}", typeof(TQuery).Name);
+
+                throw new EventlyException(typeof(TQuery).Name, innerException: exception);
+            }
+        }
+    }
+}

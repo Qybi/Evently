@@ -1,9 +1,9 @@
 ﻿using Evently.Modules.Events.Application.Events.Queries.SearchEvents;
 using Evently.Modules.Events.Application.Events.Queries.ViewModels;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -15,15 +15,17 @@ internal sealed class SearchEvents : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet("events/search", async (
-            ISender sender,
+            IQueryHandler<SearchEventsQuery, SearchEventsViewModel> handler,
             Guid? categoryId,
             DateTime? startDate,
             DateTime? endDate,
+            CancellationToken cancellationToken,
             int page = 1,
             int pageSize = 25) =>
         {
-            Result<SearchEventsViewModel> result = await sender.Send(
-                new SearchEventsQuery(categoryId, startDate, endDate, page, pageSize));
+            Result<SearchEventsViewModel> result = await handler.Handle(
+                new SearchEventsQuery(categoryId, startDate, endDate, page, pageSize),
+                cancellationToken);
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })

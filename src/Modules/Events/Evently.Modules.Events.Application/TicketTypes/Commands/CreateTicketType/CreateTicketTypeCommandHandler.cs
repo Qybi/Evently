@@ -14,7 +14,7 @@ internal sealed class CreateTicketTypeCommandHandler(
     IUnitOfWork unitOfWork)
     : ICommandHandler<CreateTicketTypeCommand, Guid>
 {
-    public async Task<Result<Guid>> Handle(CreateTicketTypeCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateTicketTypeCommand request, CancellationToken cancellationToken = default)
     {
         Event? @event = await eventRepository.GetAsync(request.EventId, cancellationToken);
 

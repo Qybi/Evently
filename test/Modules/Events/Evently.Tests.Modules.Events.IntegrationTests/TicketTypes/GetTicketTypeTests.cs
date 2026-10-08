@@ -21,7 +21,7 @@ public class GetTicketTypeTests : BaseIntegrationTest
         var query = new GetTicketTypeQuery(Guid.NewGuid());
 
         // Act
-        Result<TicketTypeViewModel> result = await Sender.Send(query);
+        Result<TicketTypeViewModel> result = await SendQuery<GetTicketTypeQuery, TicketTypeViewModel>(query);
 
         // Assert
         result.Error.Should().Be(TicketTypeErrors.NotFound(query.TicketTypeId));
@@ -33,15 +33,15 @@ public class GetTicketTypeTests : BaseIntegrationTest
         // Arrange
         await CleanDatabaseAsync();
 
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await CreateEventAsync(categoryId);
 
-        Guid ticketTypeId = await Sender.CreateTicketTypeAsync(eventId);
+        Guid ticketTypeId = await CreateTicketTypeAsync(eventId);
 
         var query = new GetTicketTypeQuery(ticketTypeId);
 
         // Act
-        Result<TicketTypeViewModel> result = await Sender.Send(query);
+        Result<TicketTypeViewModel> result = await SendQuery<GetTicketTypeQuery, TicketTypeViewModel>(query);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

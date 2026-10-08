@@ -21,7 +21,7 @@ public class GetEventTests : BaseIntegrationTest
         var query = new GetEventQuery(Guid.NewGuid());
 
         // Act
-        Result<EventViewModel> result = await Sender.Send(query);
+        Result<EventViewModel> result = await SendQuery<GetEventQuery, EventViewModel>(query);
 
         // Assert
         result.Error.Should().Be(EventErrors.NotFound(query.EventId));
@@ -33,14 +33,14 @@ public class GetEventTests : BaseIntegrationTest
         // Arrange
         await CleanDatabaseAsync();
 
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
 
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
+        Guid eventId = await CreateEventAsync(categoryId);
 
         var query = new GetEventQuery(eventId);
 
         // Act
-        Result<EventViewModel> result = await Sender.Send(query);
+        Result<EventViewModel> result = await SendQuery<GetEventQuery, EventViewModel>(query);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

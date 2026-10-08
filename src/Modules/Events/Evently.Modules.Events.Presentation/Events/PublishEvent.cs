@@ -1,8 +1,8 @@
 ﻿using Evently.Modules.Events.Application.Events.Commands.PublishEvent;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -13,9 +13,12 @@ internal sealed class PublishEvent : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("events/{id}/publish", async (Guid id, ISender sender) =>
+        app.MapPut("events/{id}/publish", async (
+            Guid id,
+            ICommandHandler<PublishEventCommand> handler,
+            CancellationToken cancellationToken) =>
         {
-            Result result = await sender.Send(new PublishEventCommand(id));
+            Result result = await handler.Handle(new PublishEventCommand(id), cancellationToken);
 
             return result.Match(Results.NoContent, ApiResults.Problem);
         })

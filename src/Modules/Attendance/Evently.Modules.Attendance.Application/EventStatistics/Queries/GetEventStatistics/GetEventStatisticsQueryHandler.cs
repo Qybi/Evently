@@ -10,7 +10,7 @@ internal sealed class GetEventStatisticsQueryHandler(IEventStatisticsQueries eve
 {
     public async Task<Result<GetEventStatisticsViewModel>> Handle(
         GetEventStatisticsQuery request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         GetEventStatisticsViewModel? eventStatistics = await eventStatisticsQueries.GetAsync(
             request.EventId,

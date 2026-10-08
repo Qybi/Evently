@@ -8,7 +8,7 @@ namespace Evently.Modules.Ticketing.Application.Customers.Commands.UpdateCustome
 internal sealed class UpdateCustomerCommandHandler(ICustomerRepository customerRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<UpdateCustomerCommand>
 {
-    public async Task<Result> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken = default)
     {
         Customer? customer = await customerRepository.GetAsync(request.CustomerId, cancellationToken);
 

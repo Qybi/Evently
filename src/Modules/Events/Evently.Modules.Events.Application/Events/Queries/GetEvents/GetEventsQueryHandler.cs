@@ -9,7 +9,7 @@ internal sealed class GetEventsQueryHandler(IEventQueries eventQueries)
 {
     public async Task<Result<IReadOnlyCollection<EventViewModel>>> Handle(
         GetEventsQuery request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         IReadOnlyCollection<EventViewModel> events = await eventQueries.GetEventsAsync(cancellationToken);
 

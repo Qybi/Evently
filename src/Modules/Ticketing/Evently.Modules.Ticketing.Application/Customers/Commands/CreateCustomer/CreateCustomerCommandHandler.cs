@@ -8,7 +8,7 @@ namespace Evently.Modules.Ticketing.Application.Customers.Commands.CreateCustome
 internal sealed class CreateCustomerCommandHandler(ICustomerRepository customerRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<CreateCustomerCommand>
 {
-    public async Task<Result> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateCustomerCommand request, CancellationToken cancellationToken = default)
     {
         var customer = Customer.Create(request.CustomerId, request.Email, request.FirstName, request.LastName);
 

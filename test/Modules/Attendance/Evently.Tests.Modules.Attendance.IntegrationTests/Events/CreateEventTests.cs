@@ -35,7 +35,7 @@ public class CreateEventTests : BaseIntegrationTest
         var command = new CreateEventCommand(eventId, title, description, location, startsAtUtc, endsAtUtc);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -56,7 +56,7 @@ public class CreateEventTests : BaseIntegrationTest
             null);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

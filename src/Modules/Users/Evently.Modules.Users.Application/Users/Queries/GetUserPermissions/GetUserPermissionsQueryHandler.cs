@@ -7,7 +7,7 @@ namespace Evently.Modules.Users.Application.Users.Queries.GetUserPermissions;
 
 internal sealed partial class GetUserPermissionsQueryHandler(IUserQueries queries) : IQueryHandler<GetUserPermissionsQuery, PermissionsResponse>
 {
-    public async Task<Result<PermissionsResponse>> Handle(GetUserPermissionsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PermissionsResponse>> Handle(GetUserPermissionsQuery request, CancellationToken cancellationToken = default)
     {
         List<UserPermissionViewModel> permissions = await queries.GetPermissionsAsync(request.IdentityId, cancellationToken);
 

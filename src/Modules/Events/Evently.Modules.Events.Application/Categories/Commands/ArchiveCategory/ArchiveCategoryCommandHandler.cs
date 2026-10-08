@@ -9,7 +9,7 @@ namespace Evently.Modules.Events.Application.Categories.Commands.ArchiveCategory
 internal sealed class ArchiveCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<ArchiveCategoryCommand>
 {
-    public async Task<Result> Handle(ArchiveCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ArchiveCategoryCommand request, CancellationToken cancellationToken = default)
     {
         Category? category = await categoryRepository.GetAsync(request.CategoryId, cancellationToken);
 

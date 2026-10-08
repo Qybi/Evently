@@ -6,18 +6,17 @@ using Evently.Shared.Application.EventBus;
 using Evently.Shared.Application.Exceptions;
 using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
-using MediatR;
 
 namespace Evently.Modules.Ticketing.Application.Tickets.DomainEventHandlers;
 
-internal sealed class TicketCreatedDomainEventHandler(ISender sender, IEventBus eventBus)
+internal sealed class TicketCreatedDomainEventHandler(IQueryHandler<GetTicketQuery, TicketViewModel> handler, IEventBus eventBus)
     : DomainEventHandler<TicketCreatedDomainEvent>
 {
     public override async Task Handle(
         TicketCreatedDomainEvent domainEvent,
         CancellationToken cancellationToken = default)
     {
-        Result<TicketViewModel> result = await sender.Send(
+        Result<TicketViewModel> result = await handler.Handle(
             new GetTicketQuery(domainEvent.TicketId),
             cancellationToken);
 

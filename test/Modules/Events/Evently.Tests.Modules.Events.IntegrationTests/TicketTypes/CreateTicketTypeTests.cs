@@ -25,7 +25,7 @@ public class CreateTicketTypeTests : BaseIntegrationTest
             Faker.Random.Decimal());
 
         // Act
-        Result<Guid> result = await Sender.Send(command);
+        Result<Guid> result = await SendCommand<CreateTicketTypeCommand, Guid>(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.NotFound(command.EventId));
@@ -35,8 +35,8 @@ public class CreateTicketTypeTests : BaseIntegrationTest
     public async Task Should_CreateTicketType_WhenCommandIsValid()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await CreateEventAsync(categoryId);
 
         var command = new CreateTicketTypeCommand(
             eventId,
@@ -46,7 +46,7 @@ public class CreateTicketTypeTests : BaseIntegrationTest
             Faker.Random.Decimal());
 
         // Act
-        Result<Guid> result = await Sender.Send(command);
+        Result<Guid> result = await SendCommand<CreateTicketTypeCommand, Guid>(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

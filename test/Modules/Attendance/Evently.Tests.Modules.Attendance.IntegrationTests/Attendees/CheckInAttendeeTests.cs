@@ -23,7 +23,7 @@ public class CheckInAttendeeTests : BaseIntegrationTest
             Guid.NewGuid());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(AttendeeErrors.NotFound(command.AttendeeId));
@@ -33,14 +33,14 @@ public class CheckInAttendeeTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenTicketDoesNotExist()
     {
         // Arrange
-        Guid attendeeId = await Sender.CreateAttendeeAsync(Guid.NewGuid());
+        Guid attendeeId = await CreateAttendeeAsync(Guid.NewGuid());
 
         var command = new CheckInAttendeeCommand(
             attendeeId,
             Guid.NewGuid());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(TicketErrors.NotFound(command.TicketId));
@@ -50,16 +50,16 @@ public class CheckInAttendeeTests : BaseIntegrationTest
     public async Task Should_ReturnSuccess_WhenAttendeeCheckedIn()
     {
         //Arrange
-        Guid attendeeId = await Sender.CreateAttendeeAsync(Guid.NewGuid());
-        Guid eventId = await Sender.CreateEventAsync(Guid.NewGuid());
-        Guid ticketId = await Sender.CreateTicketAsync(Guid.NewGuid(), attendeeId, eventId);
+        Guid attendeeId = await CreateAttendeeAsync(Guid.NewGuid());
+        Guid eventId = await CreateEventAsync(Guid.NewGuid());
+        Guid ticketId = await CreateTicketAsync(Guid.NewGuid(), attendeeId, eventId);
 
         var command = new CheckInAttendeeCommand(
             attendeeId,
             ticketId);
 
         //Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         //Assert
         result.IsSuccess.Should().BeTrue();

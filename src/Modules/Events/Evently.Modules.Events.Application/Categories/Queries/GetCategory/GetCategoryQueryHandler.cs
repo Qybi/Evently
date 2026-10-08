@@ -8,7 +8,7 @@ namespace Evently.Modules.Events.Application.Categories.GetCategory;
 internal sealed class GetCategoryQueryHandler(ICategoryQueries categoryQueries)
     : IQueryHandler<GetCategoryQuery, CategoryViewModel>
 {
-    public async Task<Result<CategoryViewModel>> Handle(GetCategoryQuery request, CancellationToken cancellationToken)
+    public async Task<Result<CategoryViewModel>> Handle(GetCategoryQuery request, CancellationToken cancellationToken = default)
     {
         CategoryViewModel? category = await categoryQueries.GetAsync(request.CategoryId, cancellationToken);
 

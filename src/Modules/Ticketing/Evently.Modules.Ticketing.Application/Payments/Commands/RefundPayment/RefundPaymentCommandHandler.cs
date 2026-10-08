@@ -9,7 +9,7 @@ namespace Evently.Modules.Ticketing.Application.Payments.Commands.RefundPayment;
 internal sealed class RefundPaymentCommandHandler(IPaymentRepository paymentRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<RefundPaymentCommand>
 {
-    public async Task<Result> Handle(RefundPaymentCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(RefundPaymentCommand request, CancellationToken cancellationToken = default)
     {
         Payment? payment = await paymentRepository.GetAsync(request.PaymentId, cancellationToken);
 

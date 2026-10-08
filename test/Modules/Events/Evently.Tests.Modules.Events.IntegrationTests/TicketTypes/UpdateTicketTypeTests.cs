@@ -20,7 +20,7 @@ public class UpdateTicketTypeTests : BaseIntegrationTest
         var command = new UpdateTicketTypePriceCommand(Guid.NewGuid(), Faker.Random.Decimal());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(TicketTypeErrors.NotFound(command.TicketTypeId));
@@ -30,14 +30,14 @@ public class UpdateTicketTypeTests : BaseIntegrationTest
     public async Task Should_ReturnSuccess_WhenTicketTypeExists()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
-        Guid ticketTypeId = await Sender.CreateTicketTypeAsync(eventId);
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await CreateEventAsync(categoryId);
+        Guid ticketTypeId = await CreateTicketTypeAsync(eventId);
 
         var command = new UpdateTicketTypePriceCommand(ticketTypeId, Faker.Random.Decimal());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

@@ -9,7 +9,7 @@ namespace Evently.Modules.Attendance.Application.Attendees.Commands.UpdateAttend
 internal sealed class UpdateAttendeeCommandHandler(IAttendeeRepository attendeeRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<UpdateAttendeeCommand>
 {
-    public async Task<Result> Handle(UpdateAttendeeCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateAttendeeCommand request, CancellationToken cancellationToken = default)
     {
         Attendee? attendee = await attendeeRepository.GetAsync(request.AttendeeId, cancellationToken);
 

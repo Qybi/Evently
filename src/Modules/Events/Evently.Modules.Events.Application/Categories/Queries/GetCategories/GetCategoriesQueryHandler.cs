@@ -9,7 +9,7 @@ internal sealed class GetCategoriesQueryHandler(ICategoryQueries categoryQueries
 {
     public async Task<Result<IReadOnlyCollection<CategoryViewModel>>> Handle(
         GetCategoriesQuery request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         IReadOnlyCollection<CategoryViewModel> categories = await categoryQueries.GetAllAsync(cancellationToken);
 

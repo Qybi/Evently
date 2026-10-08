@@ -8,7 +8,7 @@ namespace Evently.Modules.Attendance.Application.Attendees.Queries.GetAttendee;
 internal sealed class GetAttendeeQueryHandler(IAttendeeQueries attendeeQueries)
     : IQueryHandler<GetAttendeeQuery, AttendeeViewModel>
 {
-    public async Task<Result<AttendeeViewModel>> Handle(GetAttendeeQuery request, CancellationToken cancellationToken)
+    public async Task<Result<AttendeeViewModel>> Handle(GetAttendeeQuery request, CancellationToken cancellationToken = default)
     {
         AttendeeViewModel? attendee = await attendeeQueries.GetAsync(request.AttendeeId, cancellationToken);
 

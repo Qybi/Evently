@@ -27,7 +27,7 @@ public class UpdateUserTests : BaseIntegrationTest
     public async Task Should_ReturnError_WhenCommandIsNotValid(UpdateUserCommand command)
     {
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -41,7 +41,7 @@ public class UpdateUserTests : BaseIntegrationTest
         var userId = Guid.NewGuid();
 
         // Act
-        Result updateResult = await Sender.Send(
+        Result updateResult = await SendCommand(
             new UpdateUserCommand(userId, Faker.Name.FirstName(), Faker.Name.LastName()));
 
         // Assert
@@ -52,7 +52,7 @@ public class UpdateUserTests : BaseIntegrationTest
     public async Task Should_ReturnSuccess_WhenUserExists()
     {
         // Arrange
-        Result<Guid> result = await Sender.Send(new RegisterUserCommand(
+        Result<Guid> result = await SendCommand<RegisterUserCommand, Guid>(new RegisterUserCommand(
             Faker.Internet.Email(),
             Faker.Internet.Password(),
             Faker.Name.FirstName(),
@@ -61,7 +61,7 @@ public class UpdateUserTests : BaseIntegrationTest
         Guid userId = result.Value;
 
         // Act
-        Result updateResult = await Sender.Send(
+        Result updateResult = await SendCommand(
             new UpdateUserCommand(userId, Faker.Name.FirstName(), Faker.Name.LastName()));
 
         // Assert

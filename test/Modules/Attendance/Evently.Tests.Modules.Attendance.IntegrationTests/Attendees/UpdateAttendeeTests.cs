@@ -23,7 +23,7 @@ public class UpdateAttendeeTests : BaseIntegrationTest
             Faker.Name.LastName());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(AttendeeErrors.NotFound(command.AttendeeId));
@@ -33,7 +33,7 @@ public class UpdateAttendeeTests : BaseIntegrationTest
     public async Task Should_ReturnSuccess_WhenAttendeeExists()
     {
         // Arrange
-        Guid attendeeId = await Sender.CreateAttendeeAsync(Guid.NewGuid());
+        Guid attendeeId = await CreateAttendeeAsync(Guid.NewGuid());
 
         var command = new UpdateAttendeeCommand(
             attendeeId,
@@ -41,7 +41,7 @@ public class UpdateAttendeeTests : BaseIntegrationTest
             Faker.Name.LastName());
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
