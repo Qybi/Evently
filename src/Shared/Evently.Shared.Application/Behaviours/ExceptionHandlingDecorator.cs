@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Evently.Shared.Application.Behaviours;
 
+// cancellations caused by the caller's token are not failures: they are rethrown as-is,
+// so ASP.NET Core can treat them as a client disconnect instead of a 500
 internal static class ExceptionHandlingDecorator
 {
     internal sealed class CommandHandler<TCommand>(
@@ -17,7 +19,7 @@ internal static class ExceptionHandlingDecorator
             {
                 return await innerHandler.Handle(command, cancellationToken);
             }
-            catch (Exception exception)
+            catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
             {
                 logger.LogError(exception, "Unhandled exception for {CommandName}", typeof(TCommand).Name);
 
@@ -36,7 +38,7 @@ internal static class ExceptionHandlingDecorator
             {
                 return await innerHandler.Handle(command, cancellationToken);
             }
-            catch (Exception exception)
+            catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
             {
                 logger.LogError(exception, "Unhandled exception for {CommandName}", typeof(TCommand).Name);
 
@@ -55,7 +57,7 @@ internal static class ExceptionHandlingDecorator
             {
                 return await innerHandler.Handle(query, cancellationToken);
             }
-            catch (Exception exception)
+            catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
             {
                 logger.LogError(exception, "Unhandled exception for {QueryName}", typeof(TQuery).Name);
 
