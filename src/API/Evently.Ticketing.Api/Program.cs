@@ -38,16 +38,21 @@ builder.Services.AddApplication([
     Evently.Modules.Ticketing.Application.AssemblyReference.Assembly
 ]);
 
+string databaseConnectionString = builder.Configuration.GetConnectionStringOrThrow("Database");
 string cacheConnectionString = builder.Configuration.GetConnectionStringOrThrow("Cache");
 RabbitMqSettings rabbitMqSettings = new(builder.Configuration.GetConnectionStringOrThrow("Queue"));
 
 builder.Services.AddInfrastructure(
     DiagnosticsConfig.ServiceName,
-    [
-        TicketingModule.ConfigureConsumers,
-    ],
-    rabbitMqSettings,
     cacheConnectionString);
+
+builder.Services.AddWolverineInternal(
+    DiagnosticsConfig.ServiceName,
+    [
+        TicketingModule.ConfigureWolverine
+    ],
+    databaseConnectionString,
+    rabbitMqSettings);
 
 builder.Configuration.AddModuleConfiguration(["ticketing"]);
 

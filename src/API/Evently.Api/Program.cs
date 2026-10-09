@@ -13,6 +13,7 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.OpenApi;
 using Serilog;
+using Wolverine;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -42,18 +43,23 @@ builder.Services.AddApplication([
     Evently.Modules.Attendance.Application.AssemblyReference.Assembly
 ]);
 
+string databaseConnectionString = builder.Configuration.GetConnectionStringOrThrow("Database");
 string cacheConnectionString = builder.Configuration.GetConnectionStringOrThrow("Cache");
 RabbitMqSettings rabbitMqSettings = new(builder.Configuration.GetConnectionStringOrThrow("Queue"));
 
 builder.Services.AddInfrastructure(
     DiagnosticsConfig.ServiceName,
-    [
-        EventsModule.ConfigureConsumers(cacheConnectionString),
-        AttendanceModule.ConfigureConsumers,
-        UsersModule.ConfigureConsumers
-    ],
-    rabbitMqSettings,
     cacheConnectionString);
+
+builder.Services.AddWolverineInternal(
+    DiagnosticsConfig.ServiceName,
+    [
+        EventsModule.ConfigureWolverine,
+        AttendanceModule.ConfigureWolverine,
+        UsersModule.ConfigureWolverine
+    ],
+    databaseConnectionString,
+    rabbitMqSettings);
 
 builder.Configuration.AddModuleConfiguration(["events", "users", "attendance"]);
 

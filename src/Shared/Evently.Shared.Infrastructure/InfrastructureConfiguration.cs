@@ -21,9 +21,7 @@ namespace Evently.Shared.Infrastructure;
 public static class InfrastructureConfiguration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, 
-        string serviceName, 
-        Action<IRegistrationConfigurator, string>[] moduleConfigureConsumers, 
-        RabbitMqSettings rabbitMqSettings,
+        string serviceName,
         string redisConnectionString)
     {
         services.AddAuthenticationInternal();
@@ -65,29 +63,7 @@ public static class InfrastructureConfiguration
 
         services.TryAddSingleton<ICacheService, CacheService>();
 
-        services.TryAddSingleton<IEventBus, EventBus.EventBus>();
-
-        services.AddMassTransit((configure) =>
-        {
-            string instanceId = serviceName.ToLowerInvariant().Replace(".", "-"); // Evently.Api -> evently-api
-            foreach (Action<IRegistrationConfigurator, string> configureConsumer in moduleConfigureConsumers)
-            {
-                configureConsumer(configure, instanceId);
-            }
-
-            // Include the namespace so same-named consumers in different modules get separate endpoints
-            configure.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
-
-            configure.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host(new Uri(rabbitMqSettings.Host), h =>
-                {
-                    h.Username(rabbitMqSettings.Username);
-                    h.Password(rabbitMqSettings.Password);
-                });
-                cfg.ConfigureEndpoints(context);
-            });
-        });
+        services.TryAddScoped<IEventBus, EventBus.EventBus>();
 
         services
             .AddOpenTelemetry()
@@ -100,7 +76,7 @@ public static class InfrastructureConfiguration
                     .AddEntityFrameworkCoreInstrumentation()
                     .AddRedisInstrumentation()
                     .AddNpgsql()
-                    .AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
+                    .AddSource("Wolverine");
 
                 tracing.AddOtlpExporter();
             });
