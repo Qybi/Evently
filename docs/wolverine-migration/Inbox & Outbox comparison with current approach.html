@@ -1,0 +1,636 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Evently Inbox &amp; Outbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: engineering sheet. Two sequence diagrams of the same message side by side (stacked when narrow), then the diff table, the schema map and the config. */
+:root {
+  --bg: #EEF1F4;
+  --surface: #FFFFFF;
+  --fg: #17202B;
+  --muted: #5A6675;
+  --line: #C6CED9;
+  --line-soft: #E2E7ED;
+  --tx: #2160A8;
+  --tx-fill: #E9F1FB;
+  --poll: #9C4C0A;
+  --poll-fill: #FBEFE1;
+  --warn: #B42318;
+  --code-bg: #F3F5F8;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --cond: "IBM Plex Sans Condensed", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1319; --surface: #151C25; --fg: #E4E9EF; --muted: #97A3B2; --line: #364252; --line-soft: #232D39;
+    --tx: #7DB2EF; --tx-fill: #172A3F; --poll: #F0A85E; --poll-fill: #2D2217; --warn: #F38B7F; --code-bg: #10161E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1319; --surface: #151C25; --fg: #E4E9EF; --muted: #97A3B2; --line: #364252; --line-soft: #232D39;
+  --tx: #7DB2EF; --tx-fill: #172A3F; --poll: #F0A85E; --poll-fill: #2D2217; --warn: #F38B7F; --code-bg: #10161E;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 1760px;
+  margin: 0 auto;
+  padding-inline: clamp(16px, 3vw, 40px);
+  padding-block: 32px 64px;
+  display: grid;
+  gap: 48px;
+}
+h1, h2, h3 { font-family: var(--cond); text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: clamp(28px, 3.4vw, 40px); font-weight: 600; letter-spacing: -0.01em; }
+h2 { font-size: 22px; font-weight: 600; }
+h3 { font-size: 16px; font-weight: 600; }
+p { margin: 0; }
+code, .mono { font-family: var(--mono); font-size: 0.9em; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+header { display: grid; gap: 14px; }
+.lead { max-width: 75ch; color: var(--fg); }
+.lead strong { font-weight: 600; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--muted);
+  padding-top: 4px;
+}
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend svg { flex: none; }
+.lg-line { stroke: var(--fg); stroke-width: 1.6; }
+.lg-line.dash { stroke-dasharray: 6 4; }
+.lg-line.rec { stroke: var(--poll); stroke-dasharray: 6 4; }
+.lg-head { fill: var(--fg); }
+.lg-head.rec { fill: var(--poll); }
+.lg-tx { fill: var(--tx-fill); stroke: var(--tx); stroke-dasharray: 4 3; }
+.lg-wait { fill: var(--poll-fill); }
+.lg-warn { color: var(--warn); font-weight: 600; font-family: var(--cond); }
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 760px), 1fr));
+  gap: 32px;
+  align-items: start;
+}
+.side { display: grid; gap: 16px; min-width: 0; }
+.side-head { display: grid; gap: 6px; }
+.side-head p { color: var(--muted); max-width: 70ch; }
+.pill {
+  justify-self: start;
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.pill.next { border-color: var(--tx); color: var(--tx); }
+
+figure { margin: 0; min-width: 0; }
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow-x: auto;
+  padding: 8px;
+}
+figcaption { font-size: 13px; color: var(--muted); padding-top: 8px; max-width: 80ch; }
+
+/* sequence diagram */
+.seq { display: block; width: 100%; height: auto; min-width: 680px; font-family: var(--cond); }
+.seq text {
+  fill: var(--fg);
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.seq text.in { stroke: var(--tx-fill); }
+.seq .mono { font-family: var(--mono); }
+.seq .head { fill: var(--bg); stroke: var(--line); }
+.seq .head-title { font-size: 13.5px; font-weight: 600; stroke: var(--bg); }
+.seq .head-sub { font-size: 11.5px; fill: var(--muted); stroke: var(--bg); }
+.seq .head-sub.mono { font-size: 10.5px; }
+.seq .lifeline { stroke: var(--line); stroke-dasharray: 2 5; }
+.seq .phase-rule { stroke: var(--line-soft); }
+.seq .phase { font-size: 10.5px; letter-spacing: 0.08em; fill: var(--muted); font-weight: 600; }
+.seq .tag { font-size: 13px; font-weight: 600; }
+.seq .tag-sub { font-size: 11.5px; fill: var(--muted); }
+.seq .lbl { font-size: 12.5px; font-weight: 500; }
+.seq .lbl.mono { font-size: 11.5px; font-weight: 500; }
+.seq .lbl2 { font-size: 11.5px; fill: var(--muted); }
+.seq .lbl2.mono { font-size: 10.5px; }
+.seq .msg { stroke: var(--fg); stroke-width: 1.4; fill: none; }
+.seq .msg.async { stroke-dasharray: 6 4; }
+.seq .msg.recovery { stroke: var(--poll); stroke-dasharray: 6 4; }
+.seq .ah, .seq .dot { fill: var(--fg); }
+.seq .ah.recovery, .seq .dot.recovery { fill: var(--poll); }
+.seq .tx { fill: var(--tx-fill); stroke: var(--tx); stroke-dasharray: 5 3; }
+.seq .tx-label { font-size: 10.5px; fill: var(--tx); font-weight: 600; letter-spacing: 0.06em; stroke: var(--tx-fill); text-transform: uppercase; }
+.seq .wait { fill: var(--poll-fill); }
+.seq .wait-text { fill: var(--poll); stroke: var(--poll-fill); font-size: 12.5px; font-weight: 600; }
+.seq .note { fill: var(--warn); font-size: 12px; font-weight: 600; }
+.seq .num circle { fill: var(--fg); }
+.seq .num.rec circle { fill: var(--poll); }
+.seq .num text { fill: var(--surface); stroke: none; font-size: 11px; font-weight: 600; font-family: var(--sans); }
+
+/* step list */
+.steps { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.step { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; font-size: 14px; }
+.step p { min-width: 0; }
+.badge {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: inline-grid; place-items: center;
+  background: var(--fg); color: var(--surface);
+  font-size: 11px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+.badge.rec { background: var(--poll); }
+.step.wait p {
+  color: var(--poll);
+  font-weight: 600;
+  font-family: var(--cond);
+  background: var(--poll-fill);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+.step.wait .badge { background: transparent; }
+.warn { color: var(--warn); font-weight: 600; }
+
+/* comparison */
+.section { display: grid; gap: 16px; }
+.section > p { max-width: 75ch; color: var(--muted); }
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--line-soft); }
+tr:last-child th, tr:last-child td { border-bottom: 0; }
+thead th { font-family: var(--cond); font-weight: 600; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); background: var(--code-bg); }
+tbody th { font-family: var(--cond); font-weight: 600; width: 20%; }
+td.next { color: var(--fg); }
+col.now-col { width: 40%; }
+
+/* schema map */
+.maps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 24px; }
+.map { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.schema { display: grid; grid-template-columns: minmax(150px, 34%) 1fr; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+.schema:first-of-type { border-top: 0; padding-top: 0; }
+.schema-name { font-family: var(--mono); font-size: 13px; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+.schema-name small { display: block; font-family: var(--sans); font-size: 12px; color: var(--muted); font-weight: 400; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-content: start; min-width: 0; }
+.chip { font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 4px; background: var(--code-bg); border: 1px solid var(--line-soft); }
+.chip.box { border-color: var(--poll); color: var(--poll); background: var(--poll-fill); }
+.chip.env { border-color: var(--tx); color: var(--tx); background: var(--tx-fill); }
+.chip.plain { font-family: var(--sans); color: var(--muted); background: transparent; border-style: dashed; }
+.map-note { font-size: 13px; color: var(--muted); }
+@media (max-width: 520px) { .schema { grid-template-columns: 1fr; gap: 6px; } }
+
+pre {
+  margin: 0;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+pre .c { color: var(--muted); }
+.notes { display: grid; gap: 8px; max-width: 80ch; padding-left: 20px; margin: 0; }
+footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+a { color: var(--tx); }
+a:focus-visible { outline: 2px solid var(--tx); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Evently &#183; feat/migrating-masstransit-to-wolverine</div>
+    <h1>Inbox &amp; outbox: your version and Wolverine's</h1>
+    <p class="lead">One real message traced through both designs: <strong>PUT /events/{id}/publish</strong> in the Events module produces <code>EventPublishedIntegrationEvent</code>, and the Attendance module (same process, Evently.Api) turns it into its own <code>events</code> row. Ticketing, in Evently.Ticketing.Api, receives the same event the same way with its own schema.</p>
+    <div class="legend" aria-label="Legend">
+      <span><svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true"><line class="lg-line" x1="1" y1="6" x2="31" y2="6"/><polygon class="lg-head" points="39,6 30,1.5 30,10.5"/></svg>call or SQL write</span>
+      <span><svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true"><line class="lg-line dash" x1="1" y1="6" x2="31" y2="6"/><polygon class="lg-head" points="39,6 30,1.5 30,10.5"/></svg>broker hop</span>
+      <span><svg width="34" height="18" viewBox="0 0 34 18" aria-hidden="true"><rect class="lg-tx" x="1" y="1" width="32" height="16" rx="3"/></svg>one database transaction</span>
+      <span><svg width="34" height="18" viewBox="0 0 34 18" aria-hidden="true"><rect class="lg-wait" x="1" y="1" width="32" height="16" rx="3"/></svg>waiting for a Quartz poll</span>
+      <span><svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true"><line class="lg-line rec" x1="1" y1="6" x2="31" y2="6"/><polygon class="lg-head rec" points="39,6 30,1.5 30,10.5"/></svg>crash recovery only</span>
+      <span><span class="lg-warn">commit 1 / 2</span>separate commits</span>
+    </div>
+  </header>
+
+  <section class="pair" aria-label="The two designs side by side">
+    <article class="side">
+      <div class="side-head">
+        <span class="pill">Now</span>
+        <h2>Custom outbox and inbox, polled by Quartz</h2>
+        <p>Each module owns four tables and two jobs. Wolverine only carries the message between the jobs.</p>
+      </div>
+      <figure>
+        <div class="diagram">
+<svg class="seq" viewBox="0 0 940 1206" role="img" aria-label="Sequence of the current approach: the command commits the entity and an outbox row together; a Quartz job polls the outbox, runs the domain event handler and publishes to RabbitMQ; the receiving consumer stores an inbox row; a second Quartz job polls the inbox and runs the integration event handler, whose business write and idempotency row commit separately." xmlns="http://www.w3.org/2000/svg">
+<line class="phase-rule" x1="8" y1="92" x2="932" y2="92"/>
+<rect class="tx" x="100" y="148" width="230" height="105" rx="6"/>
+<rect class="wait" x="8" y="267" width="924" height="28" rx="4"/>
+<line class="phase-rule" x1="8" y1="633" x2="932" y2="633"/>
+<rect class="wait" x="8" y="838" width="924" height="28" rx="4"/>
+<line class="lifeline" x1="130" y1="70" x2="130" y2="1200"/>
+<line class="lifeline" x1="300" y1="70" x2="300" y2="1200"/>
+<line class="lifeline" x1="470" y1="70" x2="470" y2="1200"/>
+<line class="lifeline" x1="640" y1="70" x2="640" y2="1200"/>
+<line class="lifeline" x1="810" y1="70" x2="810" y2="1200"/>
+<rect class="head" x="55.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="130" y="28" text-anchor="middle">Events module</text>
+<text class="head-sub" x="130" y="44" text-anchor="middle">Evently.Api</text>
+<rect class="head" x="225.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="300" y="28" text-anchor="middle">Postgres</text>
+<text class="head-sub" x="300" y="44" text-anchor="middle">events schema</text>
+<rect class="head" x="395.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="470" y="28" text-anchor="middle">RabbitMQ</text>
+<text class="head-sub" x="470" y="44" text-anchor="middle">queue per handler</text>
+<rect class="head" x="565.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="640" y="28" text-anchor="middle">Postgres</text>
+<text class="head-sub" x="640" y="44" text-anchor="middle">attendance schema</text>
+<rect class="head" x="735.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="810" y="28" text-anchor="middle">Attendance module</text>
+<text class="head-sub" x="810" y="44" text-anchor="middle">Evently.Api</text>
+<text class="phase" x="10" y="107">HTTP REQUEST &#183; PUT /EVENTS/{ID}/PUBLISH</text>
+<text class="tag" x="130" y="136" text-anchor="middle">PublishEventCommandHandler</text>
+<text class="lbl mono in" x="215.0" y="181" text-anchor="middle">UPDATE events.events</text>
+<line class="msg sync" x1="134" y1="189" x2="290" y2="189"/>
+<polygon class="ah sync" points="298,189 289,184.5 289,193.5"/>
+<circle class="dot sync" cx="130" cy="189" r="3"/>
+<g class="num"><circle cx="22" cy="189" r="10"/><text x="22" y="193" text-anchor="middle">1</text></g>
+<text class="lbl mono in" x="215.0" y="216" text-anchor="middle">INSERT outbox_messages</text>
+<text class="lbl2 in" x="215.0" y="229" text-anchor="middle">SaveChanges interceptor</text>
+<line class="msg sync" x1="134" y1="237" x2="290" y2="237"/>
+<polygon class="ah sync" points="298,237 289,232.5 289,241.5"/>
+<circle class="dot sync" cx="130" cy="237" r="3"/>
+<g class="num"><circle cx="22" cy="237" r="10"/><text x="22" y="241" text-anchor="middle">2</text></g>
+<text class="tx-label" x="108" y="161">one transaction</text>
+<text class="wait-text" x="470.0" y="285.5" text-anchor="middle">waits for the next outbox poll &#183; up to 5 s (15 s in Development)</text>
+<text class="tag" x="130" y="323" text-anchor="middle">ProcessOutboxJob</text>
+<text class="tag-sub" x="130" y="338" text-anchor="middle">Quartz &#183; opens a transaction</text>
+<text class="lbl mono" x="215.0" y="362" text-anchor="middle">SELECT &#8230; FOR UPDATE</text>
+<text class="lbl2" x="215.0" y="375" text-anchor="middle">up to 50 unprocessed rows</text>
+<line class="msg sync" x1="134" y1="383" x2="290" y2="383"/>
+<polygon class="ah sync" points="298,383 289,378.5 289,387.5"/>
+<circle class="dot sync" cx="130" cy="383" r="3"/>
+<g class="num"><circle cx="22" cy="383" r="10"/><text x="22" y="387" text-anchor="middle">3</text></g>
+<text class="tag" x="130" y="409" text-anchor="middle">EventPublishedDomainEventHandler</text>
+<text class="tag-sub" x="130" y="424" text-anchor="middle">via IdempotentDomainEventHandler</text>
+<text class="lbl" x="215.0" y="448" text-anchor="middle">already handled?</text>
+<text class="lbl2 mono" x="215.0" y="461" text-anchor="middle">outbox_message_consumers</text>
+<line class="msg sync" x1="134" y1="469" x2="290" y2="469"/>
+<polygon class="ah sync" points="298,469 289,464.5 289,473.5"/>
+<circle class="dot sync" cx="130" cy="469" r="3"/>
+<g class="num"><circle cx="22" cy="469" r="10"/><text x="22" y="473" text-anchor="middle">4</text></g>
+<text class="lbl" x="300.0" y="496" text-anchor="middle">IEventBus &#8594; IMessageBus.PublishAsync</text>
+<text class="lbl2" x="300.0" y="509" text-anchor="middle">endpoint not durable &#183; outside any transaction</text>
+<line class="msg sync" x1="134" y1="517" x2="460" y2="517"/>
+<polygon class="ah sync" points="468,517 459,512.5 459,521.5"/>
+<circle class="dot sync" cx="130" cy="517" r="3"/>
+<g class="num"><circle cx="22" cy="517" r="10"/><text x="22" y="521" text-anchor="middle">5</text></g>
+<text class="lbl mono" x="215.0" y="544" text-anchor="middle">INSERT consumer row</text>
+<text class="lbl2" x="215.0" y="557" text-anchor="middle">own SaveChanges</text>
+<line class="msg sync" x1="134" y1="565" x2="290" y2="565"/>
+<polygon class="ah sync" points="298,565 289,560.5 289,569.5"/>
+<circle class="dot sync" cx="130" cy="565" r="3"/>
+<text class="note" x="310" y="569" text-anchor="start">own commit</text>
+<g class="num"><circle cx="22" cy="565" r="10"/><text x="22" y="569" text-anchor="middle">6</text></g>
+<text class="lbl mono" x="215.0" y="592" text-anchor="middle">UPDATE outbox_messages</text>
+<text class="lbl2" x="215.0" y="605" text-anchor="middle">processed_on_utc, error</text>
+<line class="msg sync" x1="134" y1="613" x2="290" y2="613"/>
+<polygon class="ah sync" points="298,613 289,608.5 289,617.5"/>
+<circle class="dot sync" cx="130" cy="613" r="3"/>
+<g class="num"><circle cx="22" cy="613" r="10"/><text x="22" y="617" text-anchor="middle">7</text></g>
+<text class="phase" x="10" y="648">BROKER DELIVERY</text>
+<text class="lbl" x="640.0" y="678" text-anchor="middle">deliver</text>
+<text class="lbl2" x="640.0" y="691" text-anchor="middle">EventPublishedIntegrationEvent</text>
+<line class="msg async" x1="474" y1="699" x2="800" y2="699"/>
+<polygon class="ah async" points="808,699 799,694.5 799,703.5"/>
+<circle class="dot async" cx="470" cy="699" r="3"/>
+<g class="num"><circle cx="22" cy="699" r="10"/><text x="22" y="703" text-anchor="middle">8</text></g>
+<text class="tag" x="810" y="725" text-anchor="middle">EventPublishedIntegrationEventConsumer</text>
+<text class="tag-sub" x="810" y="740" text-anchor="middle">Wolverine handler &#183; only stores the event</text>
+<text class="lbl mono" x="725.0" y="764" text-anchor="middle">INSERT inbox_messages</text>
+<text class="lbl2" x="725.0" y="777" text-anchor="middle">SaveChanges</text>
+<line class="msg sync" x1="806" y1="785" x2="650" y2="785"/>
+<polygon class="ah sync" points="642,785 651,780.5 651,789.5"/>
+<circle class="dot sync" cx="810" cy="785" r="3"/>
+<g class="num"><circle cx="22" cy="785" r="10"/><text x="22" y="789" text-anchor="middle">9</text></g>
+<text class="lbl" x="640.0" y="812" text-anchor="middle">ack</text>
+<line class="msg async" x1="806" y1="820" x2="480" y2="820"/>
+<polygon class="ah async" points="472,820 481,815.5 481,824.5"/>
+<circle class="dot async" cx="810" cy="820" r="3"/>
+<g class="num"><circle cx="22" cy="820" r="10"/><text x="22" y="824" text-anchor="middle">10</text></g>
+<text class="wait-text" x="470.0" y="856.5" text-anchor="middle">waits for the next inbox poll &#183; up to 5 s (15 s in Development)</text>
+<text class="tag" x="810" y="894" text-anchor="middle">ProcessInboxJob</text>
+<text class="tag-sub" x="810" y="909" text-anchor="middle">Quartz &#183; opens a transaction</text>
+<text class="lbl mono" x="725.0" y="933" text-anchor="middle">SELECT &#8230; FOR UPDATE</text>
+<text class="lbl2" x="725.0" y="946" text-anchor="middle">up to 50 unprocessed rows</text>
+<line class="msg sync" x1="806" y1="954" x2="650" y2="954"/>
+<polygon class="ah sync" points="642,954 651,949.5 651,958.5"/>
+<circle class="dot sync" cx="810" cy="954" r="3"/>
+<g class="num"><circle cx="22" cy="954" r="10"/><text x="22" y="958" text-anchor="middle">11</text></g>
+<text class="tag" x="810" y="980" text-anchor="middle">EventPublishedIntegrationEventHandler</text>
+<text class="tag-sub" x="810" y="995" text-anchor="middle">via IdempotentIntegrationEventHandler</text>
+<text class="lbl" x="725.0" y="1019" text-anchor="middle">already handled?</text>
+<text class="lbl2 mono" x="725.0" y="1032" text-anchor="middle">inbox_message_consumers</text>
+<line class="msg sync" x1="806" y1="1040" x2="650" y2="1040"/>
+<polygon class="ah sync" points="642,1040 651,1035.5 651,1044.5"/>
+<circle class="dot sync" cx="810" cy="1040" r="3"/>
+<g class="num"><circle cx="22" cy="1040" r="10"/><text x="22" y="1044" text-anchor="middle">12</text></g>
+<text class="lbl mono" x="725.0" y="1067" text-anchor="middle">INSERT attendance.events</text>
+<text class="lbl2" x="725.0" y="1080" text-anchor="middle">CreateEventCommand</text>
+<line class="msg sync" x1="806" y1="1088" x2="650" y2="1088"/>
+<polygon class="ah sync" points="642,1088 651,1083.5 651,1092.5"/>
+<circle class="dot sync" cx="810" cy="1088" r="3"/>
+<text class="note" x="630" y="1092" text-anchor="end">commit 1</text>
+<g class="num"><circle cx="22" cy="1088" r="10"/><text x="22" y="1092" text-anchor="middle">13</text></g>
+<text class="lbl mono" x="725.0" y="1115" text-anchor="middle">INSERT consumer row</text>
+<text class="lbl2" x="725.0" y="1128" text-anchor="middle">own SaveChanges</text>
+<line class="msg sync" x1="806" y1="1136" x2="650" y2="1136"/>
+<polygon class="ah sync" points="642,1136 651,1131.5 651,1140.5"/>
+<circle class="dot sync" cx="810" cy="1136" r="3"/>
+<text class="note" x="630" y="1140" text-anchor="end">commit 2</text>
+<g class="num"><circle cx="22" cy="1136" r="10"/><text x="22" y="1140" text-anchor="middle">14</text></g>
+<text class="lbl mono" x="725.0" y="1163" text-anchor="middle">UPDATE inbox_messages</text>
+<text class="lbl2" x="725.0" y="1176" text-anchor="middle">processed_on_utc, error</text>
+<line class="msg sync" x1="806" y1="1184" x2="650" y2="1184"/>
+<polygon class="ah sync" points="642,1184 651,1179.5 651,1188.5"/>
+<circle class="dot sync" cx="810" cy="1184" r="3"/>
+<g class="num"><circle cx="22" cy="1184" r="10"/><text x="22" y="1188" text-anchor="middle">15</text></g>
+</svg>
+        </div>
+        <figcaption>Two polling waits sit on the path. The send to RabbitMQ (5) and the handler's work (13) each commit apart from the row that says "done" (6, 14).</figcaption>
+      </figure>
+      <ol class="steps">
+        <li class="step"><span class="badge">1</span><p>The command handler changes the Event and calls <code>SaveChangesAsync</code>.</p></li>
+        <li class="step"><span class="badge">2</span><p>In the same SaveChanges, <code>InsertOutboxMessagesInterceptor</code> turns the entity's domain events into <code>outbox_messages</code> rows. Steps 1 and 2 commit together.</p></li>
+        <li class="step wait"><span class="badge"></span><p>Nothing moves until the next outbox poll.</p></li>
+        <li class="step"><span class="badge">3</span><p><code>ProcessOutboxJob</code> opens a transaction and locks up to 50 unprocessed rows.</p></li>
+        <li class="step"><span class="badge">4</span><p><code>IdempotentDomainEventHandler</code> looks for (event id, handler name) in <code>outbox_message_consumers</code>.</p></li>
+        <li class="step"><span class="badge">5</span><p><code>EventPublishedDomainEventHandler</code> publishes the integration event through Wolverine. The RabbitMQ endpoint is not durable, so this send is outside any database transaction.</p></li>
+        <li class="step"><span class="badge">6</span><p>The decorator saves the consumer row with its own SaveChanges, in a separate scope from the job.</p></li>
+        <li class="step"><span class="badge">7</span><p>The job sets <code>processed_on_utc</code> and commits. If a handler threw, the error is stored and the row still counts as processed, so it is not retried.</p></li>
+        <li class="step"><span class="badge">8</span><p>RabbitMQ delivers to the queue of <code>EventPublishedIntegrationEventConsumer</code>.</p></li>
+        <li class="step"><span class="badge">9</span><p>The consumer only copies the event into <code>attendance.inbox_messages</code>.</p></li>
+        <li class="step"><span class="badge">10</span><p>Wolverine acks the broker.</p></li>
+        <li class="step wait"><span class="badge"></span><p>Nothing moves until the next inbox poll.</p></li>
+        <li class="step"><span class="badge">11</span><p><code>ProcessInboxJob</code> opens a transaction and locks up to 50 unprocessed rows.</p></li>
+        <li class="step"><span class="badge">12</span><p><code>IdempotentIntegrationEventHandler</code> looks in <code>inbox_message_consumers</code>.</p></li>
+        <li class="step"><span class="badge">13</span><p>The real handler runs <code>CreateEventCommand</code>, which commits <code>attendance.events</code>.</p></li>
+        <li class="step"><span class="badge">14</span><p>The decorator commits the consumer row separately. <span class="warn">A crash between 13 and 14 makes the handler run again on the next poll.</span></p></li>
+        <li class="step"><span class="badge">15</span><p>The job sets <code>processed_on_utc</code> on the inbox row and commits.</p></li>
+      </ol>
+    </article>
+
+    <article class="side">
+      <div class="side-head">
+        <span class="pill next">With WolverineFx.EntityFrameworkCore</span>
+        <h2>Wolverine's durable inbox and outbox</h2>
+        <p>Envelopes live in Wolverine's tables and are written by your DbContext's transaction. Messages move as soon as a commit lands.</p>
+      </div>
+      <figure>
+        <div class="diagram">
+<svg class="seq" viewBox="0 0 940 1138" role="img" aria-label="Sequence with Wolverine and EF Core: the command commits the entity and a domain-event envelope together; the envelope goes to a durable local queue right after commit; the domain event handler commits an outgoing envelope and marks its own envelope handled in one transaction, then Wolverine sends to RabbitMQ; the receiver stores an incoming envelope, acks, and runs the handler, whose business write and handled marker commit together. Polling only happens to recover after a crash." xmlns="http://www.w3.org/2000/svg">
+<line class="phase-rule" x1="8" y1="92" x2="932" y2="92"/>
+<rect class="tx" x="100" y="162" width="230" height="105" rx="6"/>
+<line class="phase-rule" x1="8" y1="329" x2="932" y2="329"/>
+<rect class="tx" x="100" y="399" width="230" height="118" rx="6"/>
+<line class="phase-rule" x1="8" y1="629" x2="932" y2="629"/>
+<rect class="tx" x="610" y="868" width="230" height="118" rx="6"/>
+<line class="phase-rule" x1="8" y1="1002" x2="932" y2="1002"/>
+<line class="lifeline" x1="130" y1="70" x2="130" y2="1132"/>
+<line class="lifeline" x1="300" y1="70" x2="300" y2="1132"/>
+<line class="lifeline" x1="470" y1="70" x2="470" y2="1132"/>
+<line class="lifeline" x1="640" y1="70" x2="640" y2="1132"/>
+<line class="lifeline" x1="810" y1="70" x2="810" y2="1132"/>
+<rect class="head" x="55.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="130" y="28" text-anchor="middle">Events module</text>
+<text class="head-sub" x="130" y="44" text-anchor="middle">Evently.Api</text>
+<rect class="head" x="225.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="300" y="28" text-anchor="middle">Postgres</text>
+<text class="head-sub" x="300" y="44" text-anchor="middle">events schema</text>
+<text class="head-sub mono" x="300" y="57" text-anchor="middle">+ wolverine_evently_api</text>
+<rect class="head" x="395.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="470" y="28" text-anchor="middle">RabbitMQ</text>
+<text class="head-sub" x="470" y="44" text-anchor="middle">queue per handler</text>
+<rect class="head" x="565.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="640" y="28" text-anchor="middle">Postgres</text>
+<text class="head-sub" x="640" y="44" text-anchor="middle">attendance schema</text>
+<text class="head-sub mono" x="640" y="57" text-anchor="middle">+ wolverine_evently_api</text>
+<rect class="head" x="735.0" y="8" width="150" height="62" rx="6"/>
+<text class="head-title" x="810" y="28" text-anchor="middle">Attendance module</text>
+<text class="head-sub" x="810" y="44" text-anchor="middle">Evently.Api</text>
+<text class="phase" x="10" y="107">HTTP REQUEST &#183; PUT /EVENTS/{ID}/PUBLISH</text>
+<text class="tag" x="130" y="136" text-anchor="middle">PublishEventCommandHandler</text>
+<text class="tag-sub" x="130" y="151" text-anchor="middle">saves through IDbContextOutbox&lt;EventsDbContext&gt;</text>
+<text class="lbl mono in" x="215.0" y="195" text-anchor="middle">UPDATE events.events</text>
+<line class="msg sync" x1="134" y1="203" x2="290" y2="203"/>
+<polygon class="ah sync" points="298,203 289,198.5 289,207.5"/>
+<circle class="dot sync" cx="130" cy="203" r="3"/>
+<g class="num"><circle cx="22" cy="203" r="10"/><text x="22" y="207" text-anchor="middle">1</text></g>
+<text class="lbl in" x="215.0" y="230" text-anchor="middle">INSERT incoming envelope</text>
+<text class="lbl2 in" x="215.0" y="243" text-anchor="middle">EventPublishedDomainEvent</text>
+<line class="msg sync" x1="134" y1="251" x2="290" y2="251"/>
+<polygon class="ah sync" points="298,251 289,246.5 289,255.5"/>
+<circle class="dot sync" cx="130" cy="251" r="3"/>
+<g class="num"><circle cx="22" cy="251" r="10"/><text x="22" y="255" text-anchor="middle">2</text></g>
+<text class="tx-label" x="108" y="175">one transaction</text>
+<path class="msg sync loop" d="M134,279 H164 V309 H142"/>
+<polygon class="ah sync" points="133,309 142,304.5 142,313.5"/>
+<text class="lbl" x="174" y="295" text-anchor="start">after commit: to the</text>
+<text class="lbl2" x="174" y="308" text-anchor="start">local queue, in memory</text>
+<g class="num"><circle cx="22" cy="294.0" r="10"/><text x="22" y="298.0" text-anchor="middle">3</text></g>
+<text class="phase" x="10" y="344">DURABLE LOCAL QUEUE &#183; RUNS RIGHT AWAY</text>
+<text class="tag" x="130" y="373" text-anchor="middle">EventPublishedDomainEventHandler</text>
+<text class="tag-sub" x="130" y="388" text-anchor="middle">Wolverine handler &#183; transactional middleware</text>
+<text class="lbl in" x="215.0" y="432" text-anchor="middle">INSERT outgoing envelope</text>
+<text class="lbl2 in" x="215.0" y="445" text-anchor="middle">EventPublishedIntegrationEvent</text>
+<line class="msg sync" x1="134" y1="453" x2="290" y2="453"/>
+<polygon class="ah sync" points="298,453 289,448.5 289,457.5"/>
+<circle class="dot sync" cx="130" cy="453" r="3"/>
+<g class="num"><circle cx="22" cy="453" r="10"/><text x="22" y="457" text-anchor="middle">4</text></g>
+<text class="lbl in" x="215.0" y="480" text-anchor="middle">mark incoming envelope</text>
+<text class="lbl2 in" x="215.0" y="493" text-anchor="middle">Handled</text>
+<line class="msg sync" x1="134" y1="501" x2="290" y2="501"/>
+<polygon class="ah sync" points="298,501 289,496.5 289,505.5"/>
+<circle class="dot sync" cx="130" cy="501" r="3"/>
+<g class="num"><circle cx="22" cy="501" r="10"/><text x="22" y="505" text-anchor="middle">5</text></g>
+<text class="tx-label" x="108" y="412">one transaction</text>
+<text class="lbl" x="300.0" y="540" text-anchor="middle">after commit: send</text>
+<text class="lbl2" x="300.0" y="553" text-anchor="middle">durable outbox endpoint</text>
+<line class="msg sync" x1="134" y1="561" x2="460" y2="561"/>
+<polygon class="ah sync" points="468,561 459,556.5 459,565.5"/>
+<circle class="dot sync" cx="130" cy="561" r="3"/>
+<g class="num"><circle cx="22" cy="561" r="10"/><text x="22" y="565" text-anchor="middle">6</text></g>
+<text class="lbl" x="215.0" y="588" text-anchor="middle">DELETE outgoing envelope</text>
+<text class="lbl2" x="215.0" y="601" text-anchor="middle">once RabbitMQ accepted it</text>
+<line class="msg sync" x1="134" y1="609" x2="290" y2="609"/>
+<polygon class="ah sync" points="298,609 289,604.5 289,613.5"/>
+<circle class="dot sync" cx="130" cy="609" r="3"/>
+<g class="num"><circle cx="22" cy="609" r="10"/><text x="22" y="613" text-anchor="middle">7</text></g>
+<text class="phase" x="10" y="644">BROKER DELIVERY</text>
+<text class="lbl" x="640.0" y="674" text-anchor="middle">deliver</text>
+<text class="lbl2" x="640.0" y="687" text-anchor="middle">EventPublishedIntegrationEvent</text>
+<line class="msg async" x1="474" y1="695" x2="800" y2="695"/>
+<polygon class="ah async" points="808,695 799,690.5 799,699.5"/>
+<circle class="dot async" cx="470" cy="695" r="3"/>
+<g class="num"><circle cx="22" cy="695" r="10"/><text x="22" y="699" text-anchor="middle">8</text></g>
+<text class="tag" x="810" y="721" text-anchor="middle">Wolverine listener</text>
+<text class="tag-sub" x="810" y="736" text-anchor="middle">durable inbox</text>
+<text class="lbl" x="725.0" y="760" text-anchor="middle">INSERT incoming envelope</text>
+<text class="lbl2" x="725.0" y="773" text-anchor="middle">seen id + queue &#8594; rejected</text>
+<line class="msg sync" x1="806" y1="781" x2="650" y2="781"/>
+<polygon class="ah sync" points="642,781 651,776.5 651,785.5"/>
+<circle class="dot sync" cx="810" cy="781" r="3"/>
+<g class="num"><circle cx="22" cy="781" r="10"/><text x="22" y="785" text-anchor="middle">9</text></g>
+<text class="lbl" x="640.0" y="808" text-anchor="middle">ack</text>
+<line class="msg async" x1="806" y1="816" x2="480" y2="816"/>
+<polygon class="ah async" points="472,816 481,811.5 481,820.5"/>
+<circle class="dot async" cx="810" cy="816" r="3"/>
+<g class="num"><circle cx="22" cy="816" r="10"/><text x="22" y="820" text-anchor="middle">10</text></g>
+<text class="tag" x="810" y="842" text-anchor="middle">EventPublishedIntegrationEventHandler</text>
+<text class="tag-sub" x="810" y="857" text-anchor="middle">runs right away &#183; transactional middleware</text>
+<text class="lbl mono in" x="725.0" y="901" text-anchor="middle">INSERT attendance.events</text>
+<text class="lbl2 in" x="725.0" y="914" text-anchor="middle">CreateEventCommand</text>
+<line class="msg sync" x1="806" y1="922" x2="650" y2="922"/>
+<polygon class="ah sync" points="642,922 651,917.5 651,926.5"/>
+<circle class="dot sync" cx="810" cy="922" r="3"/>
+<g class="num"><circle cx="22" cy="922" r="10"/><text x="22" y="926" text-anchor="middle">11</text></g>
+<text class="lbl in" x="725.0" y="949" text-anchor="middle">mark incoming envelope</text>
+<text class="lbl2 in" x="725.0" y="962" text-anchor="middle">Handled</text>
+<line class="msg sync" x1="806" y1="970" x2="650" y2="970"/>
+<polygon class="ah sync" points="642,970 651,965.5 651,974.5"/>
+<circle class="dot sync" cx="810" cy="970" r="3"/>
+<g class="num"><circle cx="22" cy="970" r="10"/><text x="22" y="974" text-anchor="middle">12</text></g>
+<text class="tx-label" x="618" y="881">one transaction</text>
+<text class="phase" x="10" y="1017">ONLY AFTER A CRASH OR RESTART</text>
+<text class="lbl" x="215.0" y="1047" text-anchor="middle">DurabilityAgent resends</text>
+<text class="lbl2" x="215.0" y="1060" text-anchor="middle">outgoing envelopes left behind</text>
+<line class="msg recovery" x1="296" y1="1068" x2="140" y2="1068"/>
+<polygon class="ah recovery" points="132,1068 141,1063.5 141,1072.5"/>
+<circle class="dot recovery" cx="300" cy="1068" r="3"/>
+<g class="num rec"><circle cx="22" cy="1068" r="10"/><text x="22" y="1072" text-anchor="middle">&#8635;</text></g>
+<text class="lbl" x="725.0" y="1095" text-anchor="middle">DurabilityAgent replays</text>
+<text class="lbl2" x="725.0" y="1108" text-anchor="middle">incoming envelopes not Handled</text>
+<line class="msg recovery" x1="644" y1="1116" x2="800" y2="1116"/>
+<polygon class="ah recovery" points="808,1116 799,1111.5 799,1120.5"/>
+<circle class="dot recovery" cx="640" cy="1116" r="3"/>
+<g class="num rec"><circle cx="22" cy="1116" r="10"/><text x="22" y="1120" text-anchor="middle">&#8635;</text></g>
+</svg>
+        </div>
+        <figcaption>No polling on the normal path. Every "done" marker (5, 12) commits with the work it records. The DurabilityAgent polls only to pick up rows a crash left behind.</figcaption>
+      </figure>
+      <ol class="steps">
+        <li class="step"><span class="badge">1</span><p>The command handler changes the Event and saves through <code>IDbContextOutbox&lt;EventsDbContext&gt;</code>, calling <code>SaveChangesAndFlushMessagesAsync</code>.</p></li>
+        <li class="step"><span class="badge">2</span><p>In the same transaction, Wolverine collects the domain events from the ChangeTracker (<code>PublishDomainEventsFromEntityFrameworkCore</code>) and stores each one as an incoming envelope for a durable local queue.</p></li>
+        <li class="step"><span class="badge">3</span><p>After the commit, the envelope goes straight to the local queue in memory.</p></li>
+        <li class="step"><span class="badge">4</span><p><code>EventPublishedDomainEventHandler</code>, now a Wolverine handler, publishes the integration event. Wolverine stores it as an outgoing envelope.</p></li>
+        <li class="step"><span class="badge">5</span><p>In the same transaction, the domain event's envelope is marked Handled.</p></li>
+        <li class="step"><span class="badge">6</span><p>After the commit, Wolverine sends to RabbitMQ through a durable outbox endpoint.</p></li>
+        <li class="step"><span class="badge">7</span><p>Once RabbitMQ accepts the message, the outgoing envelope row is deleted.</p></li>
+        <li class="step"><span class="badge">8</span><p>RabbitMQ delivers to the handler's own queue (<code>MultipleHandlerBehavior.Separated</code>).</p></li>
+        <li class="step"><span class="badge">9</span><p>The durable inbox stores the envelope first. An id already seen on that queue is rejected as a duplicate (<code>MessageIdentity.IdAndDestination</code>).</p></li>
+        <li class="step"><span class="badge">10</span><p>Wolverine acks the broker.</p></li>
+        <li class="step"><span class="badge">11</span><p><code>EventPublishedIntegrationEventHandler</code> runs right away; <code>CreateEventCommand</code> writes <code>attendance.events</code>.</p></li>
+        <li class="step"><span class="badge">12</span><p>In the same transaction, the incoming envelope is marked Handled. The business change and the "done" marker commit together.</p></li>
+        <li class="step"><span class="badge rec">&#8635;</span><p>After a crash or restart, the DurabilityAgent resends outgoing envelopes still in the table and replays incoming ones not marked Handled.</p></li>
+      </ol>
+    </article>
+  </section>
+
+  <section class="section" aria-labelledby="diff">
+    <h2 id="diff">What changes</h2>
+    <div class="table-wrap">
+      <table>
+        <colgroup><col><col class="now-col"><col></colgroup>
+        <thead><tr><th scope="col"></th><th scope="col">Now</th><th scope="col">Wolverine + EF Core</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Time to reach the receiver</th><td>Up to 5 s for the outbox poll plus up to 5 s for the inbox poll (15 s + 15 s in Development)</td><td class="next">Right after each commit. Polling only for crash recovery</td></tr>
+          <tr><th scope="row">What the outbox holds</th><td>Domain events, in <code>&lt;module&gt;.outbox_messages</code></td><td class="next">Wolverine envelopes: domain events bound for local queues, integration events bound for RabbitMQ</td></tr>
+          <tr><th scope="row">Send to RabbitMQ</th><td>From the outbox job, outside any transaction. The endpoint is not durable</td><td class="next">Outgoing envelope saved in the business transaction, deleted after the broker accepts it</td></tr>
+          <tr><th scope="row">What the inbox holds</th><td>Integration events, in <code>&lt;module&gt;.inbox_messages</code></td><td class="next">Incoming envelopes in <code>wolverine_evently_api</code></td></tr>
+          <tr><th scope="row">Duplicate detection</th><td>Per handler: event id + handler name in <code>*_message_consumers</code></td><td class="next">Per envelope: message id + queue. One queue per handler gives the same per-handler result</td></tr>
+          <tr><th scope="row">Work + "done" marker</th><td><span class="warn">Separate commits</span></td><td class="next">One commit</td></tr>
+          <tr><th scope="row">Handler throws</th><td>Error stored, row marked processed, never retried</td><td class="next">Wolverine's error policies apply (retries if you configure them), then dead-letter storage</td></tr>
+          <tr><th scope="row">Code you maintain</th><td>Interceptor; 2 Quartz jobs and 2 idempotency decorators per module; consumer classes; 4 tables per module</td><td class="next">Wolverine configuration and routing. Integration and domain event handlers become Wolverine handlers</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="where">
+    <h2 id="where">Where the rows live</h2>
+    <p>All schemas sit in one Postgres database. That is what lets Wolverine write its envelope rows in the same transaction as a module's tables, even though they are in different schemas.</p>
+    <div class="maps">
+      <div class="map">
+        <h3>Now</h3>
+        <div class="schema"><div class="schema-name">events<small>Evently.Api</small></div><div class="chips"><span class="chip plain">business tables</span><span class="chip box">outbox_messages</span><span class="chip box">outbox_message_consumers</span><span class="chip box">inbox_messages</span><span class="chip box">inbox_message_consumers</span></div></div>
+        <div class="schema"><div class="schema-name">users<small>Evently.Api</small></div><div class="chips"><span class="chip plain">business tables</span><span class="chip box">same 4 tables</span></div></div>
+        <div class="schema"><div class="schema-name">attendance<small>Evently.Api</small></div><div class="chips"><span class="chip plain">business tables</span><span class="chip box">same 4 tables</span></div></div>
+        <div class="schema"><div class="schema-name">ticketing<small>Evently.Ticketing.Api</small></div><div class="chips"><span class="chip plain">business tables</span><span class="chip box">same 4 tables</span></div></div>
+        <div class="schema"><div class="schema-name">wolverine_evently_api<small>and wolverine_evently_ticketing_api</small></div><div class="chips"><span class="chip env">Wolverine's tables</span><span class="chip plain">created at startup; envelope tables unused, since no endpoint is durable</span></div></div>
+      </div>
+      <div class="map">
+        <h3>With Wolverine + EF Core</h3>
+        <div class="schema"><div class="schema-name">events &#183; users &#183; attendance<small>Evently.Api</small></div><div class="chips"><span class="chip plain">business tables only</span></div></div>
+        <div class="schema"><div class="schema-name">ticketing<small>Evently.Ticketing.Api</small></div><div class="chips"><span class="chip plain">business tables only</span></div></div>
+        <div class="schema"><div class="schema-name">wolverine_evently_api<small>shared by Events, Users, Attendance</small></div><div class="chips"><span class="chip env">incoming envelopes</span><span class="chip env">outgoing envelopes</span><span class="chip env">dead letters</span></div></div>
+        <div class="schema"><div class="schema-name">wolverine_evently_ticketing_api<small>Ticketing</small></div><div class="chips"><span class="chip env">incoming envelopes</span><span class="chip env">outgoing envelopes</span><span class="chip env">dead letters</span></div></div>
+        <p class="map-note">To keep envelopes per module, Wolverine 6 has ancillary stores: one store per DbContext, registered with <code>role: MessageStoreRole.Ancillary</code> and <code>.Enroll&lt;EventsDbContext&gt;()</code>. The docs show only the SQL Server form, so check the Postgres overload first.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="config">
+    <h2 id="config">What the right-hand diagram assumes</h2>
+    <pre><code><span class="c">// WolverineFx.EntityFrameworkCore, inside AddWolverineInternal</span>
+options.PersistMessagesWithPostgresql(databaseConnectionString, schemaName); <span class="c">// already there</span>
+options.UseEntityFrameworkCoreTransactions();
+options.Policies.AutoApplyTransactions();
+options.Policies.UseDurableOutboxOnAllSendingEndpoints();
+options.Policies.UseDurableInboxOnAllListeners();
+options.Policies.UseDurableLocalQueues();
+options.PublishDomainEventsFromEntityFrameworkCore&lt;Entity&gt;(x =&gt; x.DomainEvents);
+<span class="c">// plus explicit routing of domain event types to local queues:</span>
+<span class="c">// DisableConventionalLocalRouting() is on, so they would otherwise go to RabbitMQ</span></code></pre>
+    <ul class="notes">
+      <li>Your endpoints call <code>ICommandHandler</code> directly, so Wolverine's middleware does not wrap them. Step 1 needs <code>IDbContextOutbox&lt;TDbContext&gt;</code>, or the command has to go through <code>bus.InvokeAsync</code>.</li>
+      <li>A shorter variant skips the domain-event hop (steps 2 to 5): the command handler publishes the integration event through the same outbox.</li>
+      <li>Delivery stays at-least-once in both designs. What changes is that Wolverine's "done" marker commits with the work, so a replay is caught by the inbox.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Built from the code on <code>feat/migrating-masstransit-to-wolverine</code> (Events and Attendance modules, <code>WolverineExtensions.cs</code>) and the Wolverine 6 docs: <a href="https://wolverinefx.net/guide/durability/efcore/outbox-and-inbox" target="_blank" rel="noopener">EF Core inbox and outbox</a>, <a href="https://wolverinefx.net/guide/durability/efcore/transactional-middleware" target="_blank" rel="noopener">transactional middleware</a>, <a href="https://wolverinefx.net/guide/durability/efcore/domain-events" target="_blank" rel="noopener">domain events</a>, <a href="https://wolverinefx.net/guide/durability/" target="_blank" rel="noopener">durability</a>.
+  </footer>
+</div>
+
+</body></html>
