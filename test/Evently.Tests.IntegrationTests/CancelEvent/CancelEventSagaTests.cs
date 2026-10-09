@@ -79,7 +79,7 @@ public sealed class CancelEventSagaTests : BaseIntegrationTest
 
         Result<CustomerViewModel> customerResult = await Poller.WaitAsync(
             TimeSpan.FromSeconds(15),
-            async () => await SendQuery<GetCustomerByIdQuery, CustomerViewModel>(
+            async () => await SendTicketingQuery<GetCustomerByIdQuery, CustomerViewModel>(
                 new GetCustomerByIdQuery(userResult.Value)));
 
         customerResult.IsSuccess.Should().BeTrue();
@@ -94,7 +94,7 @@ public sealed class CancelEventSagaTests : BaseIntegrationTest
             TimeSpan.FromSeconds(15),
             async () =>
             {
-                Result result = await SendCommand(
+                Result result = await SendTicketingCommand(
                     new AddItemToCartCommand(customerId, ticketTypeId, 1));
 
                 return result.IsSuccess
@@ -104,7 +104,7 @@ public sealed class CancelEventSagaTests : BaseIntegrationTest
 
         addToCartResult.IsSuccess.Should().BeTrue();
 
-        Result orderResult = await SendCommand(new CreateOrderCommand(customerId));
+        Result orderResult = await SendTicketingCommand(new CreateOrderCommand(customerId));
         orderResult.IsSuccess.Should().BeTrue();
 
         // Wait until at least one order exists for the customer (the order was persisted).
@@ -113,7 +113,7 @@ public sealed class CancelEventSagaTests : BaseIntegrationTest
             async () =>
             {
                 Result<IReadOnlyCollection<GetOrdersViewModel>> result =
-                    await SendQuery<GetOrdersQuery, IReadOnlyCollection<GetOrdersViewModel>>(
+                    await SendTicketingQuery<GetOrdersQuery, IReadOnlyCollection<GetOrdersViewModel>>(
                         new GetOrdersQuery(customerId));
 
                 if (result.IsFailure || !result.Value.Any())
@@ -143,16 +143,17 @@ public sealed class CancelEventSagaTests : BaseIntegrationTest
 
         // -----------------------------------------------------------------------
         // 5. Assert – poll until the order is Refunded.
-        //    An order with status Refunded proves that the saga completed the
-        //    RefundPayments arm.  Both arms must complete before the saga
-        //    finalises, so reaching this state confirms the full saga flow.
+        //    An order with status Refunded proves that the saga started and that
+        //    Ticketing ran the RefundPayments arm (payment fully refunded → order refunded).
+        //    It does not prove that the saga completed: the ArchiveTickets arm and
+        //    EventCancellationCompletedIntegrationEvent are not observed here.
         // -----------------------------------------------------------------------
         Result<IReadOnlyCollection<GetOrdersViewModel>> refundedOrdersResult = await Poller.WaitAsync(
             TimeSpan.FromSeconds(30),
             async () =>
             {
                 Result<IReadOnlyCollection<GetOrdersViewModel>> result =
-                    await SendQuery<GetOrdersQuery, IReadOnlyCollection<GetOrdersViewModel>>(
+                    await SendTicketingQuery<GetOrdersQuery, IReadOnlyCollection<GetOrdersViewModel>>(
                         new GetOrdersQuery(customerId));
 
                 if (result.IsFailure)
