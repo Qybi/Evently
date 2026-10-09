@@ -22,7 +22,7 @@ public class PublishEventTests : BaseIntegrationTest
         var command = new PublishEventCommand(eventId);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.Error.Should().Be(EventErrors.NotFound(eventId));
@@ -32,13 +32,13 @@ public class PublishEventTests : BaseIntegrationTest
     public async Task Should_ReturnFailure_WhenEventDoesNotHaveAnyTicketTypes()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await CreateEventAsync(categoryId);
 
         var command = new PublishEventCommand(eventId);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         //Assert
         result.Error.Should().Be(EventErrors.NoTicketTypesFound);
@@ -48,14 +48,14 @@ public class PublishEventTests : BaseIntegrationTest
     public async Task Should_ReturnSuccess_WhenEventIsPublished()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
-        Guid eventId = await Sender.CreateEventAsync(categoryId);
-        await Sender.CreateTicketTypeAsync(eventId);
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
+        Guid eventId = await CreateEventAsync(categoryId);
+        await CreateTicketTypeAsync(eventId);
 
         var command = new PublishEventCommand(eventId);
 
         // Act
-        Result result = await Sender.Send(command);
+        Result result = await SendCommand(command);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

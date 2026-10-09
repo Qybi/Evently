@@ -11,7 +11,7 @@ internal sealed class UpdateTicketTypePriceCommandHandler(
     IUnitOfWork unitOfWork)
     : ICommandHandler<UpdateTicketTypePriceCommand>
 {
-    public async Task<Result> Handle(UpdateTicketTypePriceCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateTicketTypePriceCommand request, CancellationToken cancellationToken = default)
     {
         TicketType? ticketType = await ticketTypeRepository.GetAsync(request.TicketTypeId, cancellationToken);
 

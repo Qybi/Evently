@@ -23,7 +23,7 @@ internal sealed class CreateOrderCommandHandler(
     CartService cartService,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateOrderCommand>
 {
-    public async Task<Result> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateOrderCommand request, CancellationToken cancellationToken = default)
     {
         await using ITransaction transaction =await unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -78,11 +78,12 @@ internal sealed class CreateOrderCommandHandler(
 
         paymentRepository.Insert(payment);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        // payment already charged: from here on the client disconnecting must not abort the order
+        await unitOfWork.SaveChangesAsync(CancellationToken.None);
 
-        await transaction.CommitAsync(cancellationToken);
+        await transaction.CommitAsync(CancellationToken.None);
 
-        await cartService.ClearAsync(customer.Id, cancellationToken);
+        await cartService.ClearAsync(customer.Id, CancellationToken.None);
 
         return Result.Success();
     }

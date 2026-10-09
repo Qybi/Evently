@@ -13,7 +13,7 @@ internal sealed class PublishEventCommandHandler(
     IUnitOfWork unitOfWork)
     : ICommandHandler<PublishEventCommand>
 {
-    public async Task<Result> Handle(PublishEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(PublishEventCommand request, CancellationToken cancellationToken = default)
     {
         Event? @event = await eventRepository.GetAsync(request.EventId, cancellationToken);
 

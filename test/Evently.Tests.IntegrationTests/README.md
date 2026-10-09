@@ -48,6 +48,8 @@ sequenceDiagram
 
 In `AddItemToCartTests` only the Users → Ticketing hop is cross-module. The event and its ticket type are created directly in Ticketing through `CommandHelpers.CreateEventAsync` (Ticketing's own `CreateEventCommand`), not by publishing an event from the Events module.
 
+[`HandlerDecorationTests`](Decorators/HandlerDecorationTests.cs) is not a scenario: it resolves every `ICommandHandler` and `IQueryHandler` of each host's module assemblies and asserts the outermost instance is `ExceptionHandlingDecorator`. Scrutor's `TryDecorate` skips silently when it finds nothing to wrap, and a handler registered after `AddApplication` is never wrapped, so this test is what fails when the decorator chain is missing.
+
 ## How the tests are built
 
 ### Real hosts, real infrastructure
@@ -82,7 +84,9 @@ The database is **not** reset between tests. Each test generates its own data wi
 
 ### Commands and queries, not HTTP
 
-[`BaseIntegrationTest`](Abstractions/BaseIntegrationTest.cs) opens a DI scope on each running host and exposes one `ISender` per host: `Sender` for Events, Users and Attendance, `TicketingSender` for Ticketing. A command or query only has a handler in the host that runs its module, so it must go through that host's sender. Tests send the same MediatR commands and queries the endpoints would send, skipping the HTTP layer and authentication. Each module is used only through its public Application contracts.
+[`BaseIntegrationTest`](Abstractions/BaseIntegrationTest.cs) opens a DI scope on each running host and resolves the command or query handler from it: `SendCommand` and `SendQuery` for Events, Users and Attendance, `SendTicketingCommand` and `SendTicketingQuery` for Ticketing. A command or query only has a handler in the host that runs its module, so it must go through that host's helpers. Tests call the same `ICommandHandler` and `IQueryHandler` the endpoints call, skipping the HTTP layer and authentication. Each module is used only through its public Application contracts.
+
+For `ICommand<TResult>` and `IQuery<TResult>` the type arguments must be written out, because C# cannot infer `TResult` from a constraint: `SendCommand<RegisterUserCommand, Guid>(command)`, `SendQuery<GetAttendeeQuery, AttendeeViewModel>(query)`. A plain `ICommand` infers it: `SendCommand(command)`.
 
 ### Waiting for eventual consistency
 
@@ -93,7 +97,8 @@ Propagation between modules is asynchronous: the outbox job and the inbox job ea
 ```csharp
 Result<CustomerViewModel> customerResult = await Poller.WaitAsync(
     TimeSpan.FromSeconds(35),
-    async () => await TicketingSender.Send(new GetCustomerByIdQuery(userResult.Value)));
+    async () => await SendTicketingQuery<GetCustomerByIdQuery, CustomerViewModel>(
+        new GetCustomerByIdQuery(userResult.Value)));
 
 customerResult.IsSuccess.Should().BeTrue();
 ```
@@ -101,11 +106,11 @@ customerResult.IsSuccess.Should().BeTrue();
 ## Adding a scenario
 
 1. Create a folder named after the scenario and a test class deriving from `BaseIntegrationTest`.
-2. Send the command to the originating module through the sender of the host that runs it (`Sender` or `TicketingSender`) and assert that it succeeded.
-3. Poll a query of the **destination** module, through its host's sender, with `Poller.WaitAsync` until the propagated data appears.
+2. Send the command to the originating module through the helpers of the host that runs it (`SendCommand` or `SendTicketingCommand`) and assert that it succeeded.
+3. Poll a query of the **destination** module, through its host's helpers, with `Poller.WaitAsync` until the propagated data appears.
 4. Assert on the destination module's result.
 
-Shared arrange steps go in [`CommandHelpers`](Abstractions/CommandHelpers.cs) as `ISender` extension methods. Call them on the sender of the module they target: `CreateEventAsync` sends Ticketing's `CreateEventCommand`, so it runs on `TicketingSender`.
+Shared arrange steps go in [`CommandHelpers`](Abstractions/CommandHelpers.cs), a `partial` of `BaseIntegrationTest`. Each helper picks the host of the module it targets: `CreateEventAsync` sends Ticketing's `CreateEventCommand`, so it uses `SendTicketingCommand`.
 
 ## Running
 

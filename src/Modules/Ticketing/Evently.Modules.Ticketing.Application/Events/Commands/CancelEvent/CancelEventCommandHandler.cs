@@ -9,7 +9,7 @@ namespace Evently.Modules.Ticketing.Application.Events.Commands.CancelEvent;
 internal sealed class CancelEventCommandHandler(IEventRepository eventRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<CancelEventCommand>
 {
-    public async Task<Result> Handle(CancelEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CancelEventCommand request, CancellationToken cancellationToken = default)
     {
         Event? @event = await eventRepository.GetAsync(request.EventId, cancellationToken);
 

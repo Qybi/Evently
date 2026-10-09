@@ -18,7 +18,7 @@ internal sealed class CreateTicketCommandHandler(
     IUnitOfWork unitOfWork)
     : ICommandHandler<CreateTicketCommand>
 {
-    public async Task<Result> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateTicketCommand request, CancellationToken cancellationToken = default)
     {
         Attendee? attendee = await attendeeRepository.GetAsync(request.AttendeeId, cancellationToken);
 

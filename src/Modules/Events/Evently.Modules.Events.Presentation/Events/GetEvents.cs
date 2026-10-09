@@ -1,9 +1,9 @@
 ﻿using Evently.Modules.Events.Application.Events.Queries.GetEvents;
 using Evently.Modules.Events.Application.Events.Queries.ViewModels;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -14,9 +14,11 @@ internal sealed class GetEvents : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("events", async (ISender sender) =>
+        app.MapGet("events", async (
+            IQueryHandler<GetEventsQuery, IReadOnlyCollection<EventViewModel>> handler,
+            CancellationToken cancellationToken) =>
         {
-            Result<IReadOnlyCollection<EventViewModel>> result = await sender.Send(new GetEventsQuery());
+            Result<IReadOnlyCollection<EventViewModel>> result = await handler.Handle(new GetEventsQuery(), cancellationToken);
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })

@@ -22,7 +22,7 @@ public class GetUserPermissionTests : BaseIntegrationTest
         string identityId = Guid.NewGuid().ToString();
 
         // Act
-        Result<PermissionsResponse> permissionsResult = await Sender.Send(new GetUserPermissionsQuery(identityId));
+        Result<PermissionsResponse> permissionsResult = await SendQuery<GetUserPermissionsQuery, PermissionsResponse>(new GetUserPermissionsQuery(identityId));
 
         // Assert
         permissionsResult.Error.Should().Be(UserErrors.NotFound(identityId));
@@ -32,7 +32,7 @@ public class GetUserPermissionTests : BaseIntegrationTest
     public async Task Should_ReturnPermissions_WhenUserExists()
     {
         // Arrange
-        Result<Guid> result = await Sender.Send(new RegisterUserCommand(
+        Result<Guid> result = await SendCommand<RegisterUserCommand, Guid>(new RegisterUserCommand(
             Faker.Internet.Email(),
             Faker.Internet.Password(),
             Faker.Name.FirstName(),
@@ -41,7 +41,7 @@ public class GetUserPermissionTests : BaseIntegrationTest
         string identityId = DbContext.Users.Single(u => u.Id == result.Value).IdentityId;
 
         // Act
-        Result<PermissionsResponse> permissionsResult = await Sender.Send(new GetUserPermissionsQuery(identityId));
+        Result<PermissionsResponse> permissionsResult = await SendQuery<GetUserPermissionsQuery, PermissionsResponse>(new GetUserPermissionsQuery(identityId));
 
         // Assert
         permissionsResult.IsSuccess.Should().BeTrue();

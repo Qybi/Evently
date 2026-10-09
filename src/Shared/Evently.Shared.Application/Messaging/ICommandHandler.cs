@@ -1,11 +1,13 @@
 ﻿using Evently.Shared.Domain;
-using MediatR;
 
 namespace Evently.Shared.Application.Messaging;
 
-public interface ICommandHandler<in TCommand> : IRequestHandler<TCommand, Result>
-    where TCommand : ICommand;
+public interface ICommandHandler<in TCommand> where TCommand : ICommand
+{
+    Task<Result> Handle(TCommand command, CancellationToken cancellationToken = default);
+}
 
-public interface ICommandHandler<in TCommand, TResponse> : IRequestHandler<TCommand, Result<TResponse>>
-    where TCommand : ICommand<TResponse>;
-
+public interface ICommandHandler<in TCommand, TResponse> where TCommand : ICommand<TResponse>
+{
+    Task<Result<TResponse>> Handle(TCommand command, CancellationToken cancellationToken = default);
+}

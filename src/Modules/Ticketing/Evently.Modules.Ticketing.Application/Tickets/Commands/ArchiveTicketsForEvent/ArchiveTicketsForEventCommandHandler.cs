@@ -14,7 +14,7 @@ internal sealed class ArchiveTicketsForEventCommandHandler(
     IUnitOfWork unitOfWork)
     : ICommandHandler<ArchiveTicketsForEventCommand>
 {
-    public async Task<Result> Handle(ArchiveTicketsForEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ArchiveTicketsForEventCommand request, CancellationToken cancellationToken = default)
     {
         await using ITransaction transaction =await unitOfWork.BeginTransactionAsync(cancellationToken);
 

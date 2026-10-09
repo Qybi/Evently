@@ -8,7 +8,7 @@ namespace Evently.Modules.Ticketing.Application.Customers.Queries.GetCustomer;
 internal sealed class GetCustomerByIdQueryHandler(ICustomerQueries customerQueries)
     : IQueryHandler<GetCustomerByIdQuery, CustomerViewModel>
 {
-    public async Task<Result<CustomerViewModel>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<CustomerViewModel>> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken = default)
     {
         CustomerViewModel? customer = await customerQueries.GetCustomerByIdAsync(request.CustomerId, cancellationToken);
 

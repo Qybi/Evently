@@ -4,16 +4,15 @@ using Evently.Modules.Attendance.Application.Attendees.Commands.CreateAttendee;
 using Evently.Modules.Attendance.Application.Events.Commands.CreateEvent;
 using Evently.Modules.Attendance.Application.Tickets.Commands.CreateTicket;
 using Evently.Shared.Domain;
-using MediatR;
 
 namespace Evently.Tests.Modules.Attendance.IntegrationTests.Abstractions;
 
-internal static class CommandHelpers
+public abstract partial class BaseIntegrationTest
 {
-    internal static async Task<Guid> CreateAttendeeAsync(this ISender sender, Guid attendeeId)
+    protected async Task<Guid> CreateAttendeeAsync(Guid attendeeId)
     {
         var faker = new Faker();
-        Result result = await sender.Send(
+        Result result = await SendCommand(
             new CreateAttendeeCommand(
                 attendeeId,
                 faker.Internet.Email(),
@@ -25,13 +24,12 @@ internal static class CommandHelpers
         return attendeeId;
     }
 
-    internal static async Task<Guid> CreateTicketAsync(
-        this ISender sender,
+    protected async Task<Guid> CreateTicketAsync(
         Guid ticketId,
         Guid attendeeId,
         Guid eventId)
     {
-        Result result = await sender.Send(
+        Result result = await SendCommand(
             new CreateTicketCommand(
                 ticketId,
                 attendeeId,
@@ -43,10 +41,10 @@ internal static class CommandHelpers
         return ticketId;
     }
 
-    internal static async Task<Guid> CreateEventAsync(this ISender sender, Guid eventId)
+    protected async Task<Guid> CreateEventAsync(Guid eventId)
     {
         var faker = new Faker();
-        Result result = await sender.Send(
+        Result result = await SendCommand(
             new CreateEventCommand(
                 eventId,
                 faker.Music.Genre(),

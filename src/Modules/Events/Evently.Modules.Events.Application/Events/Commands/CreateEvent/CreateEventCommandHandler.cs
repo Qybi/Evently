@@ -16,7 +16,7 @@ internal sealed class CreateEventCommandHandler(
     ICategoryRepository categoryRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateEventCommand, Guid>
 {
-    public async Task<Result<Guid>> Handle(CreateEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateEventCommand request, CancellationToken cancellationToken = default)
     {
         if (request.StartsAtUtc < dateTimeProvider.UtcNow)
         {

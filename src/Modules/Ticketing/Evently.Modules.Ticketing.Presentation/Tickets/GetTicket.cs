@@ -1,9 +1,9 @@
 ﻿using Evently.Modules.Ticketing.Application.Tickets.Queries.GetTicket;
 using Evently.Modules.Ticketing.Application.Tickets.Queries.ViewModels;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -14,9 +14,12 @@ internal sealed class GetTicket : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("tickets/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("tickets/{id}", async (
+            Guid id,
+            IQueryHandler<GetTicketQuery, TicketViewModel> handler,
+            CancellationToken cancellationToken) =>
         {
-            Result<TicketViewModel> result = await sender.Send(new GetTicketQuery(id));
+            Result<TicketViewModel> result = await handler.Handle(new GetTicketQuery(id), cancellationToken);
 
             return result.Match(Results.Ok, ApiResults.Problem);
         })

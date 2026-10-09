@@ -8,7 +8,7 @@ namespace Evently.Modules.Ticketing.Application.Tickets.Queries.GetTicketByCode;
 internal sealed class GetTicketByCodeQueryHandler(ITicketQueries ticketQueries)
     : IQueryHandler<GetTicketByCodeQuery, TicketViewModel>
 {
-    public async Task<Result<TicketViewModel>> Handle(GetTicketByCodeQuery request, CancellationToken cancellationToken)
+    public async Task<Result<TicketViewModel>> Handle(GetTicketByCodeQuery request, CancellationToken cancellationToken = default)
     {
         TicketViewModel? ticket = await ticketQueries.GetTicketByCodeAsync(request.Code, cancellationToken);
 

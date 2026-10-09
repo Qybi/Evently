@@ -1,9 +1,9 @@
 ﻿using Evently.Modules.Ticketing.Application.Abstractions.Authentication;
 using Evently.Modules.Ticketing.Application.Carts.RemoveItemFromCart;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -14,10 +14,15 @@ internal sealed class RemoveFromCart : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("carts/remove", async (Request request, ICustomerContext customerContext, ISender sender) =>
+        app.MapPut("carts/remove", async (
+            Request request,
+            ICustomerContext customerContext,
+            ICommandHandler<RemoveItemFromCartCommand> handler,
+            CancellationToken cancellationToken) =>
         {
-            Result result = await sender.Send(
-                new RemoveItemFromCartCommand(customerContext.CustomerId, request.TicketTypeId));
+            Result result = await handler.Handle(
+                new RemoveItemFromCartCommand(customerContext.CustomerId, request.TicketTypeId),
+                cancellationToken);
 
             return result.Match(Results.NoContent, ApiResults.Problem);
         })

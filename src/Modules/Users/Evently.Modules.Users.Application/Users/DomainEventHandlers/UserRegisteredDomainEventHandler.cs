@@ -6,15 +6,15 @@ using Evently.Shared.Application.EventBus;
 using Evently.Shared.Application.Exceptions;
 using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
-using MediatR;
 
 namespace Evently.Modules.Users.Application.Users.DomainEventHandlers;
 
-internal sealed class UserRegisteredDomainEventHandler(ISender sender, IEventBus eventBus) : DomainEventHandler<UserRegisteredDomainEvent>
+internal sealed class UserRegisteredDomainEventHandler(IQueryHandler<GetUserQuery, UserViewModel> handler, IEventBus eventBus)
+    : DomainEventHandler<UserRegisteredDomainEvent>
 {
     public override async Task Handle(UserRegisteredDomainEvent notification, CancellationToken cancellationToken = default)
     {
-        Result<UserViewModel> result = await sender.Send(new GetUserQuery(notification.UserId), cancellationToken);
+        Result<UserViewModel> result = await handler.Handle(new GetUserQuery(notification.UserId), cancellationToken);
 
         if (result.IsFailure)
         {

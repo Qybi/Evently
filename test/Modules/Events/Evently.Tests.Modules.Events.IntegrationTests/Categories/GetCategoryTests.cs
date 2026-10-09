@@ -21,7 +21,7 @@ public class GetCategoryTests : BaseIntegrationTest
         var query = new GetCategoryQuery(Guid.NewGuid());
 
         // Act
-        Result result = await Sender.Send(query);
+        Result result = await SendQuery<GetCategoryQuery, CategoryViewModel>(query);
 
         // Assert
         result.Error.Should().Be(CategoryErrors.NotFound(query.CategoryId));
@@ -31,12 +31,12 @@ public class GetCategoryTests : BaseIntegrationTest
     public async Task Should_ReturnCategory_WhenCategoryExists()
     {
         // Arrange
-        Guid categoryId = await Sender.CreateCategoryAsync(Faker.Music.Genre());
+        Guid categoryId = await CreateCategoryAsync(Faker.Music.Genre());
 
         var query = new GetCategoryQuery(categoryId);
 
         // Act
-        Result<CategoryViewModel> result = await Sender.Send(query);
+        Result<CategoryViewModel> result = await SendQuery<GetCategoryQuery, CategoryViewModel>(query);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

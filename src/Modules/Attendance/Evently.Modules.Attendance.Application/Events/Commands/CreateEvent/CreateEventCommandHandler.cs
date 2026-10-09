@@ -10,7 +10,7 @@ internal sealed class CreateEventCommandHandler(
     IUnitOfWork unitOfWork)
     : ICommandHandler<CreateEventCommand>
 {
-    public async Task<Result> Handle(CreateEventCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateEventCommand request, CancellationToken cancellationToken = default)
     {
         var @event = Event.Create(
             request.EventId,

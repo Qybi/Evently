@@ -1,9 +1,9 @@
 ﻿using Evently.Modules.Ticketing.Application.Abstractions.Authentication;
 using Evently.Modules.Ticketing.Application.Carts.AddItemToCart;
+using Evently.Shared.Application.Messaging;
 using Evently.Shared.Domain;
 using Evently.Shared.Presentation.ApiResults;
 using Evently.Shared.Presentation.Endpoints;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -14,13 +14,18 @@ internal sealed class AddToCart : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("carts/add", async (Request request, ICustomerContext customerContext, ISender sender) =>
+        app.MapPut("carts/add", async (
+            Request request,
+            ICustomerContext customerContext,
+            ICommandHandler<AddItemToCartCommand> handler,
+            CancellationToken cancellationToken) =>
         {
-            Result result = await sender.Send(
+            Result result = await handler.Handle(
                 new AddItemToCartCommand(
                     customerContext.CustomerId,
                     request.TicketTypeId,
-                    request.Quantity));
+                    request.Quantity),
+                cancellationToken);
 
             return result.Match(() => Results.Ok(), ApiResults.Problem);
         })
