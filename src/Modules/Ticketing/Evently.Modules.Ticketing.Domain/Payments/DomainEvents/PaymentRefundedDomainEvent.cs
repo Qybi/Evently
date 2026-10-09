@@ -2,9 +2,11 @@
 
 namespace Evently.Modules.Ticketing.Domain.Payments.DomainEvents;
 
-public sealed class PaymentRefundedDomainEvent(Guid paymentId, Guid transactionId, decimal refundAmount) : DomainEvent
+public sealed class PaymentRefundedDomainEvent(Guid paymentId, Guid orderId, Guid transactionId, decimal refundAmount) : DomainEvent
 {
     public Guid PaymentId { get; init; } = paymentId;
+
+    public Guid OrderId { get; init; } = orderId;
 
     public Guid TransactionId { get; init; } = transactionId;
 

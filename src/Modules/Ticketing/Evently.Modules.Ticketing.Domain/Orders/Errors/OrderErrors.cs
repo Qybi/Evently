@@ -11,4 +11,8 @@ public static class OrderErrors
     public static readonly Error TicketsAlreadyIssues = Error.Problem(
         "Order.TicketsAlreadyIssued",
         "The tickets for this order were already issued");
+
+    public static readonly Error AlreadyRefunded = Error.Problem(
+        "Order.AlreadyRefunded",
+        "The order was already refunded");
 }

@@ -68,4 +68,16 @@ public sealed class Order : Entity
 
         return Result.Success();
     }
+
+    public Result Refund()
+    {
+        if (Status == OrderStatus.Refunded)
+        {
+            return Result.Failure(OrderErrors.AlreadyRefunded);
+        }
+
+        Status = OrderStatus.Refunded;
+
+        return Result.Success();
+    }
 }
