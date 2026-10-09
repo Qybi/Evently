@@ -2,19 +2,15 @@ using Evently.Modules.Users.Infrastructure.Database;
 using Evently.Shared.Application.EventBus;
 using Evently.Shared.Infrastructure.Inbox;
 using Evently.Shared.Infrastructure.Serialization;
-using MassTransit;
 using Newtonsoft.Json;
 
 namespace Evently.Modules.Users.Infrastructure.Inbox;
 
-internal sealed class IntegrationEventConsumer<TIntegrationEvent>(UsersDbContext usersDbContext)
-    : IConsumer<TIntegrationEvent>
-    where TIntegrationEvent : IntegrationEvent
+// Wolverine needs a public consumer and does not handle generics, so we have to create an abstract class first, then all concrete consumers will inherit from it.
+public abstract class IntegrationEventConsumer<TIntegrationEvent>(UsersDbContext usersDbContext) where TIntegrationEvent : IntegrationEvent
 {
-    public async Task Consume(ConsumeContext<TIntegrationEvent> context)
+    public async Task Handle(TIntegrationEvent integrationEvent)
     {
-        TIntegrationEvent integrationEvent = context.Message;
-
         var inboxMessage = new InboxMessage
         {
             Id = integrationEvent.Id,
@@ -25,6 +21,6 @@ internal sealed class IntegrationEventConsumer<TIntegrationEvent>(UsersDbContext
 
         usersDbContext.Set<InboxMessage>().Add(inboxMessage);
 
-        await usersDbContext.SaveChangesAsync(context.CancellationToken);
+        await usersDbContext.SaveChangesAsync();
     }
 }

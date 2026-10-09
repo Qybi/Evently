@@ -1,0 +1,16 @@
+﻿using Evently.Modules.Attendance.Infrastructure.Database;
+using Evently.Modules.Events.IntegrationEvents;
+using Evently.Modules.Ticketing.IntegrationEvents;
+using Evently.Modules.Users.IntegrationEvents;
+
+namespace Evently.Modules.Attendance.Infrastructure.Inbox;
+
+public sealed class UserRegisteredIntegrationEventConsumer(AttendanceDbContext attendanceDbContext) : IntegrationEventConsumer<UserRegisteredIntegrationEvent>(attendanceDbContext);
+
+public sealed class UserProfileUpdatedIntegrationEventConsumer(AttendanceDbContext attendanceDbContext) : IntegrationEventConsumer<UserProfileUpdatedIntegrationEvent>(attendanceDbContext);
+
+public sealed class EventPublishedIntegrationEventConsumer(AttendanceDbContext attendanceDbContext) : IntegrationEventConsumer<EventPublishedIntegrationEvent>(attendanceDbContext);
+
+public sealed class TicketIssuedIntegrationEventConsumer(AttendanceDbContext attendanceDbContext) : IntegrationEventConsumer<TicketIssuedIntegrationEvent>(attendanceDbContext);
+
+public sealed class EventCancellationStartedIntegrationEventConsumer(AttendanceDbContext attendanceDbContext) : IntegrationEventConsumer<EventCancellationStartedIntegrationEvent>(attendanceDbContext);
