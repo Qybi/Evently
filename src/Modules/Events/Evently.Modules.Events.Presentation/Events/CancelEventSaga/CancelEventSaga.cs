@@ -1,82 +1,78 @@
 ﻿using Evently.Modules.Events.IntegrationEvents;
 using Evently.Modules.Ticketing.IntegrationEvents;
-using MassTransit;
+using Wolverine.Persistence.Sagas;
 
 namespace Evently.Modules.Events.Presentation.Events.CancelEventSaga;
 
-public sealed class CancelEventSaga : MassTransitStateMachine<CancelEventState>
+#pragma warning disable IDE0060 // Remove unused parameter
+// Wolverine uses Orchestration Sagas, while previous definition used MassTransit state machine saga.
+public sealed class CancelEventSaga : Wolverine.Saga
 {
-    // possible states of the state machine (Initial and Final are built into MassTransit)
-    public State CancellationStarted { get; private set; }
-    public State PaymentsRefunded { get; private set; }
-    public State TicketsArchived { get; private set; }
+    public Guid Id { get; set; }
 
-    // events that change the state machine's state
-    // the first 3 are integration events received from the bus,
-    // EventCancellationCompleted is raised internally by MassTransit (see CompositeEvent below)
-    public Event<EventCanceledIntegrationEvent> EventCanceled { get; private set; }
-    public Event<EventPaymentsRefundedIntegrationEvent> EventPaymentsRefunded { get; private set; }
-    public Event<EventTicketsArchivedIntegrationEvent> EventTicketsArchived { get; private set; }
-    public Event EventCancellationCompleted { get; private set; }
+    public bool PaymentsRefunded { get; set; }
+    public bool TicketsArchived { get; set; }
 
-    public CancelEventSaga()
+    public static (CancelEventSaga, EventCancellationStartedIntegrationEvent) Start(
+        EventCanceledIntegrationEvent message)
     {
-        // correlation: tells MassTransit which saga instance an incoming message belongs to (message EventId = saga CorrelationId).
-        // for EventCanceled, which starts the saga, EventId becomes the new instance's CorrelationId -> one saga per canceled event
-        Event(() => EventCanceled, c => c.CorrelateById(m => m.Message.EventId));
-        Event(() => EventPaymentsRefunded, c => c.CorrelateById(m => m.Message.EventId));
-        Event(() => EventTicketsArchived, c => c.CorrelateById(m => m.Message.EventId));
+        var saga = new CancelEventSaga { Id = message.EventId };
 
-        InstanceState(s => s.CurrentState);
+        var started = new EventCancellationStartedIntegrationEvent(
+            message.Id,
+            message.OccurredOnUtc,
+            message.EventId);
 
-        // the saga instance doesn't exist yet: EventCanceled creates it
-        // initially means: "While in the initial state..."
-        Initially(
-            // "...when i encounter the EventCanceled event..."
-            When(EventCanceled)
-                // "...publish the EventCancellationStartedIntegrationEvent..."
-                .Publish((context) => new EventCancellationStartedIntegrationEvent(context.Message.Id, context.Message.OccurredOnUtc, context.Message.EventId))
-                // "...and transition to the CancellationStarted state"
-                .TransitionTo(CancellationStarted)
-            );
+        return (saga, started);
+    }
 
-        // during cancellation started state, transition to either one of the 2 states depending on which one happens first
-        During(CancellationStarted,
-            When(EventPaymentsRefunded)
-                .TransitionTo(PaymentsRefunded),
-            When(EventTicketsArchived)
-                .TransitionTo(TicketsArchived));
+    // this methods updates the saga state 
+    public EventCancellationCompletedIntegrationEvent? Handle(
+        [SagaIdentityFrom(nameof(EventPaymentsRefundedIntegrationEvent.EventId))]
+        EventPaymentsRefundedIntegrationEvent message)
+    {
+        PaymentsRefunded = true;
+        return TryComplete();
+    }
 
-        // one step is done, wait for the other one: which During applies depends on which step completed first.
-        During(PaymentsRefunded,
-            When(EventTicketsArchived)
-                .TransitionTo(TicketsArchived));
+    public EventCancellationCompletedIntegrationEvent? Handle(
+        [SagaIdentityFrom(nameof(EventTicketsArchivedIntegrationEvent.EventId))]
+        EventTicketsArchivedIntegrationEvent message)
+    {
+        TicketsArchived = true;
+        return TryComplete();
+    }
 
-        During(TicketsArchived,
-            When(EventPaymentsRefunded)
-                .TransitionTo(PaymentsRefunded));
+    // methods to handle a case where the saga is not found, for example if the saga has already completed and been removed from the database
+    // optional, but useful to log or trigger some self-check/compensating actions
+    public static void NotFound(
+        [SagaIdentityFrom(nameof(EventPaymentsRefundedIntegrationEvent.EventId))]
+        EventPaymentsRefundedIntegrationEvent message)
+    {
+        // Handle not found
+    }
 
-        // MassTransit declaration method to "when both events have happened - in any order -, raise the event specified in the first delegate"
-        CompositeEvent(
-            () => EventCancellationCompleted,
-            // int bitmask persisted on the saga instance (bit 0 = PaymentsRefunded, bit 1 = TicketsArchived).
-            // each message is handled in a separate saga load, so MassTransit must store which events already arrived
-            state => state.CancellationCompletedStatus,
-            EventPaymentsRefunded, EventTicketsArchived);
+    public static void NotFound(
+        [SagaIdentityFrom(nameof(EventTicketsArchivedIntegrationEvent.EventId))]
+        EventTicketsArchivedIntegrationEvent message)
+    {
+        // Handle not found
+    }
 
-        // in any state (except Initial/Final), when the composite EventCancellationCompleted event fires: publish completion and move to Final
-        DuringAny(
-            When(EventCancellationCompleted)
-                .Publish(context =>
-                    new EventCancellationCompletedIntegrationEvent(
-                        Guid.NewGuid(),
-                        DateTime.UtcNow,
-                        context.Saga.CorrelationId))
-                .Finalize());
+    private EventCancellationCompletedIntegrationEvent? TryComplete()
+    {
+        if (!PaymentsRefunded || !TicketsArchived)
+        {
+            return null;
+        }
 
-        // we keep this one commented since we want full history saved on redis with the status marked as "Final", method deletes sagas once they're marked as final. Useful to release memory
-        #pragma warning disable S125
-        //SetCompletedWhenFinalized();
-        #pragma warning restore S125
+        MarkCompleted();
+
+        return new EventCancellationCompletedIntegrationEvent(
+            Guid.NewGuid(),
+            DateTime.UtcNow,
+            Id);
     }
 }
+
+#pragma warning restore IDE0060 // Remove unused parameter
