@@ -1,4 +1,6 @@
-﻿namespace Evently.Modules.Users.IntegrationEvents;
+﻿using Evently.Shared.Application.EventBus;
 
-public sealed record GetUserPermissionsRequest(string IdentityId);
+namespace Evently.Modules.Users.IntegrationEvents;
+
+public sealed record GetUserPermissionsRequest(string IdentityId) : IRpcRequest<GetUserPermissionsReply>;
 

@@ -14,7 +14,6 @@ using Evently.Shared.Application.EventBus;
 using Evently.Shared.Application.Messaging;
 using Evently.Shared.Infrastructure.Outbox;
 using Evently.Shared.Presentation.Endpoints;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Quartz;
+using Wolverine;
 
 namespace Evently.Modules.Users.Infrastructure;
 
@@ -42,9 +42,9 @@ public static class UsersModule
         return services;
     }
 
-    public static void ConfigureConsumers(IRegistrationConfigurator registrationConfigurator, string instanceId)
+    public static void ConfigureWolverine(WolverineOptions options)
     {
-        registrationConfigurator.AddConsumer<GetUserPermissionsRequestConsumer>().Endpoint(x => x.InstanceId = instanceId);
+        options.Discovery.IncludeType<GetUserPermissionsRequestConsumer>();
     }
 
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
@@ -66,6 +66,8 @@ public static class UsersModule
 
         services.AddTransient<IIdentityProviderService, IdentityProviderService>();
 
+        // Singleton options let Wolverine's generated handler code build the DbContext itself.
+        // With scoped options (a lambda) it would need service location, which Wolverine 6 forbids by default
         services.AddDbContext<UsersDbContext>(
             (sp, options) => options
                 .UseNpgsql(
@@ -73,7 +75,8 @@ public static class UsersModule
                     npgsqlOptions => npgsqlOptions
                         .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Users))
                 .UseSnakeCaseNamingConvention()
-                .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>()));
+                .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>()),
+            optionsLifetime: ServiceLifetime.Singleton);
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UsersDbContext>());
 
