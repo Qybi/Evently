@@ -19,6 +19,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Quartz;
+using Wolverine;
+using Wolverine.RDBMS;
 
 namespace Evently.Modules.Events.Infrastructure;
 
@@ -37,19 +39,19 @@ public static class EventsModule
         return services;
     }
 
-    public static Action<IRegistrationConfigurator, string> ConfigureConsumers(string cacheConnectionString)
+    public static void ConfigureWolverine(WolverineOptions options)
     {
-        // by default SAGAs in MassTransit are persisted in memory (or you can use SQL db, Redis, etc.)
-        return (registrationConfigurator, instanceId) => registrationConfigurator
-            .AddSagaStateMachine<CancelEventSaga, CancelEventState>()
-            .Endpoint(c => c.InstanceId = instanceId)
-            .RedisRepository(cacheConnectionString);
+        options.AddSagaType<CancelEventSaga>();
+
+        options.Discovery.IncludeType<CancelEventSaga>();
     }
 
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         string databaseConnectionString = configuration.GetConnectionString("Database")!;
 
+        // Singleton options let Wolverine's generated handler code build the DbContext itself.
+        // With scoped options (a lambda) it would need service location, which Wolverine 6 forbids by default
         services.AddDbContext<EventsDbContext>(
             (sp, options) => options
             .UseNpgsql(
@@ -57,7 +59,8 @@ public static class EventsModule
                 npgsqlOptions => npgsqlOptions.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Events)
             )
             .UseSnakeCaseNamingConvention()
-            .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>())
+            .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>()),
+            optionsLifetime: ServiceLifetime.Singleton
         );
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<EventsDbContext>());

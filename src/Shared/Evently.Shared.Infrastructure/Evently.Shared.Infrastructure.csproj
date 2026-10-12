@@ -9,9 +9,6 @@
 		<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
 		<PackageReference Include="AspNetCore.HealthChecks.Redis" />
 		<PackageReference Include="EFCore.NamingConventions" />
-		<PackageReference Include="MassTransit" />
-		<PackageReference Include="MassTransit.RabbitMQ" />
-		<PackageReference Include="MassTransit.Redis" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
 		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
@@ -26,6 +23,10 @@
 		<PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" />
 		<PackageReference Include="Quartz.Extensions.Hosting" />
 		<PackageReference Include="Scrutor" />
+		<PackageReference Include="WolverineFx" />
+		<PackageReference Include="WolverineFx.Postgresql" />
+		<PackageReference Include="WolverineFx.RabbitMQ" />
+		<PackageReference Include="WolverineFx.RuntimeCompilation" />
 	</ItemGroup>
 
 </Project>

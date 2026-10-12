@@ -1,0 +1,15 @@
+﻿using Evently.Modules.Events.IntegrationEvents;
+using Evently.Modules.Ticketing.Infrastructure.Database;
+using Evently.Modules.Users.IntegrationEvents;
+
+namespace Evently.Modules.Ticketing.Infrastructure.Inbox;
+
+public sealed class UserRegisteredIntegrationEventConsumer(TicketingDbContext ticketingDbContext) : IntegrationEventConsumer<UserRegisteredIntegrationEvent>(ticketingDbContext);
+
+public sealed class UserProfileUpdatedIntegrationEventConsumer(TicketingDbContext ticketingDbContext) : IntegrationEventConsumer<UserProfileUpdatedIntegrationEvent>(ticketingDbContext);
+
+public sealed class EventPublishedIntegrationEventConsumer(TicketingDbContext ticketingDbContext) : IntegrationEventConsumer<EventPublishedIntegrationEvent>(ticketingDbContext);
+
+public sealed class TicketTypePriceChangedIntegrationEventConsumer(TicketingDbContext ticketingDbContext) : IntegrationEventConsumer<TicketTypePriceChangedIntegrationEvent>(ticketingDbContext);
+
+public sealed class EventCancellationStartedIntegrationEventConsumer(TicketingDbContext ticketingDbContext) : IntegrationEventConsumer<EventCancellationStartedIntegrationEvent>(ticketingDbContext);

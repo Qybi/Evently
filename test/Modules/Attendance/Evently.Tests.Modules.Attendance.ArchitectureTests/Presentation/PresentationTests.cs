@@ -1,5 +1,5 @@
-﻿using Evently.Tests.Modules.Attendance.ArchitectureTests.Abstractions;
-using MassTransit;
+﻿using Evently.Shared.Application.EventBus;
+using Evently.Tests.Modules.Attendance.ArchitectureTests.Abstractions;
 using NetArchTest.Rules;
 
 namespace Evently.Tests.Modules.Attendance.ArchitectureTests.Presentation;
@@ -11,7 +11,9 @@ public class PresentationTests : BaseTest
     {
         Types.InAssembly(PresentationAssembly)
             .That()
-            .ImplementInterface(typeof(IConsumer<>))
+            .ImplementInterface(typeof(IIntegrationEventHandler<>))
+            .Or()
+            .Inherit(typeof(IntegrationEventHandler<>))
             .Should()
             .BeSealed()
             .GetResult()
@@ -19,13 +21,39 @@ public class PresentationTests : BaseTest
     }
 
     [Fact]
-    public void IntegrationEventHandler_ShouldHave_NameEndingWith_Consumer()
+    public void IntegrationEventHandler_ShouldHave_NameEndingWith_IntegrationEventHandler()
     {
         Types.InAssembly(PresentationAssembly)
             .That()
-            .ImplementInterface(typeof(IConsumer<>))
+            .ImplementInterface(typeof(IIntegrationEventHandler<>))
+            .Or()
+            .Inherit(typeof(IntegrationEventHandler<>))
             .Should()
-            .HaveNameEndingWith("Consumer")
+            .HaveNameEndingWith("IntegrationEventHandler")
+            .GetResult()
+            .ShouldBeSuccessful();
+    }
+
+    [Fact]
+    public void RpcConsumer_Should_BeSealed()
+    {
+        Types.InAssembly(PresentationAssembly)
+            .That()
+            .ImplementInterface(typeof(IRpcConsumer<,>))
+            .Should()
+            .BeSealed()
+            .GetResult()
+            .ShouldBeSuccessful();
+    }
+
+    [Fact]
+    public void RpcConsumer_ShouldHave_NameEndingWith_RequestConsumer()
+    {
+        Types.InAssembly(PresentationAssembly)
+            .That()
+            .ImplementInterface(typeof(IRpcConsumer<,>))
+            .Should()
+            .HaveNameEndingWith("RequestConsumer")
             .GetResult()
             .ShouldBeSuccessful();
     }

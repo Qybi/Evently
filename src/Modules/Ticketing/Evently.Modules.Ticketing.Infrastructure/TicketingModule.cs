@@ -1,5 +1,4 @@
-﻿using Evently.Modules.Events.IntegrationEvents;
-using Evently.Modules.Ticketing.Application.Abstractions.Authentication;
+﻿using Evently.Modules.Ticketing.Application.Abstractions.Authentication;
 using Evently.Modules.Ticketing.Application.Abstractions.Data;
 using Evently.Modules.Ticketing.Application.Abstractions.Payments;
 using Evently.Modules.Ticketing.Application.Carts;
@@ -19,7 +18,6 @@ using Evently.Modules.Ticketing.Infrastructure.Payments;
 using Evently.Modules.Ticketing.Infrastructure.Queries;
 using Evently.Modules.Ticketing.Infrastructure.Repositories;
 using Evently.Modules.Ticketing.Infrastructure.Tickets;
-using Evently.Modules.Users.IntegrationEvents;
 using Evently.Shared.Application.Authorization;
 using Evently.Shared.Application.EventBus;
 using Evently.Shared.Application.Messaging;
@@ -32,6 +30,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Quartz;
+using Wolverine;
 
 namespace Evently.Modules.Ticketing.Infrastructure;
 
@@ -52,13 +51,13 @@ public static class TicketingModule
         return services;
     }
 
-    public static void ConfigureConsumers(IRegistrationConfigurator registrationConfigurator, string instanceId)
+    public static void ConfigureWolverine(WolverineOptions options)
     {
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<UserRegisteredIntegrationEvent>>().Endpoint(c => c.InstanceId = instanceId);
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<UserProfileUpdatedIntegrationEvent>>().Endpoint(c => c.InstanceId = instanceId);
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<EventPublishedIntegrationEvent>>().Endpoint(c => c.InstanceId = instanceId);
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<TicketTypePriceChangedIntegrationEvent>>().Endpoint(c => c.InstanceId = instanceId);
-        registrationConfigurator.AddConsumer<IntegrationEventConsumer<EventCancellationStartedIntegrationEvent>>().Endpoint(c => c.InstanceId = instanceId);
+        options.Discovery.IncludeType<UserRegisteredIntegrationEventConsumer>();
+        options.Discovery.IncludeType<UserProfileUpdatedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<EventPublishedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<TicketTypePriceChangedIntegrationEventConsumer>();
+        options.Discovery.IncludeType<EventCancellationStartedIntegrationEventConsumer>();
     }
 
 #pragma warning disable S1172
@@ -67,6 +66,8 @@ public static class TicketingModule
 #pragma warning restore S1172
 #pragma warning restore IDE0060
     {
+        // Singleton options let Wolverine's generated handler code build the DbContext itself.
+        // With scoped options (a lambda) it would need service location, which Wolverine 6 forbids by default
         services.AddDbContext<TicketingDbContext>((sp, options) =>
             options
                 .UseNpgsql(
@@ -74,7 +75,8 @@ public static class TicketingModule
                     npgsqlOptions => npgsqlOptions
                         .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Ticketing))
                 .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>())
-                .UseSnakeCaseNamingConvention());
+                .UseSnakeCaseNamingConvention(),
+            optionsLifetime: ServiceLifetime.Singleton);
 
 
         services.AddScoped<ICustomerRepository, CustomerRepository>();

@@ -6,10 +6,7 @@
 		<PackageReference Include="coverlet.collector" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
-		<PackageReference Include="Testcontainers.Keycloak" />
-		<PackageReference Include="Testcontainers.PostgreSql" />
-		<PackageReference Include="Testcontainers.RabbitMq" />
-		<PackageReference Include="Testcontainers.Redis" />
+		<PackageReference Include="Testcontainers" />
 		<PackageReference Include="xunit" />
 		<PackageReference Include="NetArchTest.Rules" />
 		<PackageReference Include="xunit.runner.visualstudio" />
@@ -25,9 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="realm-export.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="..\compose\**" LinkBase="compose" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\.files\realm-export.json" Link="compose\identity\realm-export.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
