@@ -1,0 +1,47 @@
+# Infrastructure for the integration tests. Each test project starts its own copy through Testcontainers (ComposeBuilder),
+# as a Docker Compose project named evently-tests-<module>-<random>, so the containers are grouped and named in Docker Desktop.
+# No host ports and no volumes: Testcontainers publishes the ports the tests need and removes everything when the tests end
+services:
+  database:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: evently
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      # -h localhost checks over TCP: during initialization Postgres only listens on its Unix socket
+      test: ["CMD-SHELL", "pg_isready -h localhost -U postgres -d evently"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  cache:
+    image: redis:8
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  queue:
+    image: rabbitmq:4-management-alpine
+    # The image runs as root and only drops to rabbitmq for the server. The healthcheck runs as the container user, so as root it can create
+    # /var/lib/rabbitmq/.erlang.cookie before the server boots; the server then cannot read it (eacces) and exits
+    user: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  identity:
+    # The realm is baked into the image: Docker Compose runs inside a Testcontainers helper container,
+    # so a bind mount would point to a path that exists only inside that container, not on the Docker host
+    build: ./identity
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin

@@ -2,14 +2,13 @@
 using Evently.Shared.Application.Authorization;
 using Evently.Shared.Application.Caching;
 using Evently.Shared.Domain;
-using Evently.Shared.Domain.Errors;
-using MassTransit;
+using Evently.Shared.Infrastructure.EventBus;
+using Wolverine;
 
 namespace Evently.Modules.Ticketing.Infrastructure.Authorization;
 
-internal sealed class PermissionService(IRequestClient<GetUserPermissionsRequest> requestClient, ICacheService cacheService) : IPermissionService
+internal sealed class PermissionService(IMessageBus bus, ICacheService cacheService) : IPermissionService
 {
-    private static readonly Error NotFound = Error.NotFound(nameof(PermissionService), "User was not found.");
     private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(5);
     public async Task<Result<PermissionsResponse>> GetUserPermissionsAsync(string identityId, CancellationToken cancellationToken = default)
     {
@@ -20,23 +19,18 @@ internal sealed class PermissionService(IRequestClient<GetUserPermissionsRequest
             return Result.Success(cachedPermissions);
         }
 
-        // MassTransit call to call and wait for the response from the Users module. Basically API logic over the message bus.
-        // Cool thing is that it acts like an RPC call where I can return multiple types of responses and handle them accordingly.
-        Response<PermissionsResponse, Error> response = await requestClient.GetResponse<PermissionsResponse, Error>(new GetUserPermissionsRequest(identityId), cancellationToken);
+        // Wolverine call to call and wait for the reply from the Users module. Basically API logic over the message bus.
+        // It acts like an RPC call: Wolverine allows a single reply type, so the reply wraps either the permissions or the error.
+        GetUserPermissionsReply reply = await bus.CallAsync(new GetUserPermissionsRequest(identityId), cancellationToken);
 
-        if (response.Is(out Response<Error> errorResponse))
+        var result = reply.ToResult();
+
+        if (result.IsSuccess)
         {
-            return Result.Failure<PermissionsResponse>(errorResponse.Message);
+            await cacheService.SetAsync(CreateCacheKey(identityId), result.Value, CacheExpiration, cancellationToken);
         }
 
-        if (response.Is(out Response<PermissionsResponse> successResponse))
-        {
-            await cacheService.SetAsync(CreateCacheKey(identityId), successResponse.Message, CacheExpiration, cancellationToken);
-
-            return Result.Success(successResponse.Message);
-        }
-
-        return Result.Failure<PermissionsResponse>(NotFound);
+        return result;
     }
 
     private static string CreateCacheKey(string identityId) => $"user_permissions:{identityId}";
