@@ -7,5 +7,5 @@ public interface IUserQueries
 {
     Task<UserViewModel?> GetAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<List<UserPermissionViewModel>> GetPermissionsAsync(string identityId, CancellationToken cancellationToken = default);
+    Task<UserPermissionsViewModel?> GetPermissionsAsync(string identityId, CancellationToken cancellationToken = default);
 }

@@ -9,14 +9,17 @@ internal sealed class UserRepository(UsersDbContext context) : IUserRepository
 {
     public async Task<User?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
+        // Permissions are part of the User aggregate: grant/revoke need the current set loaded
+        return await context.Users
+            .Include(u => u.Permissions)
+            .SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 
     public void Insert(User user)
     {
-        foreach (Role role in user.Roles)
+        foreach (Permission permission in user.Permissions)
         {
-            context.Attach(role);
+            context.Attach(permission);
         }
 
         context.Users.Add(user);

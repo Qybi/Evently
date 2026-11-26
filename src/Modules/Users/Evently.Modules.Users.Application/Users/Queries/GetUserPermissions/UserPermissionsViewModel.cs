@@ -1,7 +1,7 @@
 ﻿namespace Evently.Modules.Users.Application.Users.Queries.GetUserPermissions;
 
-public sealed record UserPermissionViewModel
+public sealed record UserPermissionsViewModel
 {
     public Guid UserId { get; init; }
-    public string Permission { get; set; }
+    public List<string> Permissions { get; init; } = [];
 }
