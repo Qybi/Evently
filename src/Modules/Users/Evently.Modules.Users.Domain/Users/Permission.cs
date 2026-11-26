@@ -20,6 +20,22 @@ public sealed class Permission
     public static readonly Permission CheckInTicket = new("tickets:check-in");
     public static readonly Permission GetEventStatistics = new("event-statistics:read");
 
+    // Template copied onto a user at registration, not a live link like a role was.
+    // Must stay below the fields it references: static fields initialize in source order.
+    public static readonly Permission[] DefaultForNewUser =
+    [
+        GetUser,
+        ModifyUser,
+        SearchEvents,
+        GetTicketTypes,
+        GetCart,
+        AddToCart,
+        RemoveFromCart,
+        GetOrders,
+        CreateOrder,
+        GetTickets,
+        CheckInTicket
+    ];
 
     public Permission(string code)
     {

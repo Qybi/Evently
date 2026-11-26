@@ -18,22 +18,16 @@ internal sealed class UserQueries(UsersDbContext context) : IUserQueries
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<List<UserPermissionViewModel>> GetPermissionsAsync(string identityId, CancellationToken cancellationToken = default)
+    public async Task<UserPermissionsViewModel?> GetPermissionsAsync(string identityId, CancellationToken cancellationToken = default)
     {
-        return await (
-                from u in context.Users
-                join ur in context.Set<Dictionary<string, object>>("RoleUser")
-                    on u.Id equals EF.Property<Guid>(ur, "UserId")
-                join rp in context.Set<Dictionary<string, object>>("PermissionRole")
-                    on EF.Property<string>(ur, "RolesName") equals EF.Property<string>(rp, "RoleName")
-                where u.IdentityId == identityId
-                select new UserPermissionViewModel
-                {
-                    UserId = u.Id,
-                    Permission = EF.Property<string>(rp, "PermissionCode")
-                })
+        return await context.Users
             .AsNoTracking()
-            .Distinct()
-            .ToListAsync(cancellationToken);
+            .Where(u => u.IdentityId == identityId)
+            .Select(u => new UserPermissionsViewModel
+            {
+                UserId = u.Id,
+                Permissions = u.Permissions.Select(p => p.Code).ToList()
+            })
+            .SingleOrDefaultAsync(cancellationToken);
     }
 }

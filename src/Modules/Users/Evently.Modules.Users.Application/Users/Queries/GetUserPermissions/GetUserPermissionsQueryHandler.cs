@@ -9,13 +9,14 @@ internal sealed partial class GetUserPermissionsQueryHandler(IUserQueries querie
 {
     public async Task<Result<PermissionsResponse>> Handle(GetUserPermissionsQuery request, CancellationToken cancellationToken = default)
     {
-        List<UserPermissionViewModel> permissions = await queries.GetPermissionsAsync(request.IdentityId, cancellationToken);
+        UserPermissionsViewModel? user = await queries.GetPermissionsAsync(request.IdentityId, cancellationToken);
 
-        if (permissions.Count == 0)
+        // A null user means not found. An empty permission list is a valid user with nothing granted.
+        if (user is null)
         {
             return Result.Failure<PermissionsResponse>(UserErrors.NotFound(request.IdentityId));
         }
 
-        return new PermissionsResponse(permissions[0].UserId, permissions.Select(p => p.Permission).ToHashSet());
+        return new PermissionsResponse(user.UserId, user.Permissions.ToHashSet());
     }
 }
